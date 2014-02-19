@@ -1,0 +1,117 @@
+<html>
+    
+    <head>
+        <title>SVG Test &mdash; LCARS Shape and Scale Test</title>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+            
+        <script src="LCARS_Components.js"></script>
+        
+        <script language="javascript" type="text/javascript">
+            var  init = function() {
+                
+                var ulc = new LCARSCorner("ULC", "Upper Left", 5, 5, 1000, 1, ES_SHAPE_NW | EC_ORANGE | ES_STATIC);
+                var llc = new LCARSCorner("LLC", "Lower Left", 5, 102, 1000, 1, ES_SHAPE_SW | EC_ORANGE | ES_STATIC);
+                var urc = new LCARSCorner("URC", "Upper Right", 1010, 5, 905, 1, ES_SHAPE_NE | EC_ORANGE | ES_STATIC);
+                var lrc = new LCARSCorner("LRC", "Lower Right", 1010, 102, 905, 1, ES_SHAPE_SE | EC_ORANGE | ES_STATIC);
+                
+                var ulc1 = new LCARSCorner("ULC1", "Text", 5, 199, 500, 1, ES_SHAPE_NW | EC_WHITE);
+                var ulc2 = new LCARSCorner("ULC2", "Text", 160, 239, 500, 1, ES_SHAPE_NW | EC_L_BLUE);
+                var ulc3 = new LCARSCorner("ULC3", "Text", 320, 279, 500, 1, ES_SHAPE_NW | EC_M_BLUE);
+                var ulc4 = new LCARSCorner("ULC4", "Text", 480, 319, 500, 1, ES_SHAPE_NW | EC_BLUE);
+                var ulc5 = new LCARSCorner("ULC5", "Text", 640, 359, 500, 1, ES_SHAPE_NW | EC_D_BLUE);
+                var ulc6 = new LCARSCorner("ULC6", "Text", 800, 399, 500, 1, ES_SHAPE_NW | EC_YELLOW);
+                var ulc7 = new LCARSCorner("ULC7", "Text", 960, 439, 500, 1, ES_SHAPE_NW | EC_ORANGE);
+                var ulc8 = new LCARSCorner("ULC8", "Text", 1120, 479, 500, 1, ES_SHAPE_NW | EC_RED);
+                
+                var rect1 = new LCARSRectangle("RECT1", "", 10, 575, 1000, 30, EC_ORANGE);
+                var rect2 = new LCARSRectangle("RECT2", "rect2", 10, 650, 150, 60, EC_ORANGE);
+                var rect3 = new LCARSRectangle("RECT3", "rect3", 10, 720, 150, 60, ES_RECT_RND | EC_ORANGE);
+                var rect4 = new LCARSRectangle("RECT4", "rect4", 10, 790, 150, 60, ES_RECT_RND_W | EC_ORANGE);
+                var rect5 = new LCARSRectangle("RECT5", "rect5", 10, 860, 150, 60, ES_RECT_RND_E | EC_ORANGE);
+                
+                var rect_c = new LCARSRectangle("rect_c", "CENTER", 500, 790, 150, 60, ES_LABEL_C | ES_RECT_RND | EC_ORANGE);
+                var rect_s = new LCARSRectangle("rect_s", "South", 500, 860, 150, 60, ES_LABEL_S | ES_RECT_RND | EC_ORANGE);
+                var rect_sw = new LCARSRectangle("rect_sw", "Southwest", 345, 860, 150, 60, ES_LABEL_SW | ES_RECT_RND | EC_ORANGE);
+                var rect_w = new LCARSRectangle("rect_w", "West", 345, 790, 150, 60, ES_LABEL_W | ES_RECT_RND | EC_ORANGE);
+                var rect_nw = new LCARSRectangle("rect_nw", "Northwest", 345, 720, 150, 60, ES_LABEL_NW | ES_RECT_RND | EC_ORANGE);
+                var rect_n = new LCARSRectangle("rect_n", "North", 500, 720, 150, 60, ES_LABEL_N | ES_RECT_RND | EC_ORANGE);
+                var rect_ne = new LCARSRectangle("rect_ne", "Northeast", 655, 720, 150, 60, ES_LABEL_NE | ES_RECT_RND | EC_ORANGE);
+                var rect_e = new LCARSRectangle("rect_e", "East", 655, 790, 150, 60, ES_LABEL_E | ES_RECT_RND | EC_ORANGE);
+                var rect_se = new LCARSRectangle("rect_se", "Southeast", 655, 860, 150, 60, ES_LABEL_SE | ES_RECT_RND | EC_ORANGE);
+                
+                var button_1 = new LCARSButton("button_1", "Button 1", 850, 650, 1, EC_ORANGE);
+                var button_2 = new LCARSButton("button_2", "Button 2", 1005, 650, 2, EC_ORANGE);
+                var button_3 = new LCARSButton("button_3", "Button 3", 1160, 650, 3, EC_ORANGE);
+                var button_4 = new LCARSButton("button_4", "Button 4", 1315, 650, 4, EC_ORANGE);
+                var button_5 = new LCARSButton("button_5", "Button 5", 850, 845, 0, ES_RECT_RND | EC_ORANGE);
+                var button_6 = new LCARSButton("button_6", "Button 6", 1005, 845, 0, ES_RECT_RND | EC_ORANGE);
+                var button_7 = new LCARSButton("button_7", "Button 7", 1160, 845, 0, ES_RECT_RND | EC_ORANGE);
+                
+                var text_1 = new LCARSText("text_1", "LCARS Title Text", 1490, 650 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE);
+                var text_2 = new LCARSText("text_2", "LCARS Subtitle Text", 1490, 720 + FONT_SUBTITLE_SIZE, EF_SUBTITLE | EC_ORANGE);
+                var text_3 = new LCARSText("text_3", "LCARS Button Text", 1490, 770 + FONT_BUTTON_SIZE, EF_BUTTON | EC_ORANGE);
+                var text_4 = new LCARSText("text_4", "LCARS Body Text", 1490, 805 + FONT_BODY_SIZE, EF_BODY | EC_ORANGE);
+                var text_5 = new LCARSText("text_5", "LCARS Tiny Text", 1490, 835 + FONT_TINY_SIZE, EF_TINY | EC_ORANGE);
+                
+                document.body.innerHTML = "<svg width='100%' height='100%' viewbox='0 0 1920 1080'>" +
+                ulc.getHTML() +
+                llc.getHTML() +
+                urc.getHTML() +
+                lrc.getHTML() +
+                ulc1.getHTML() +
+                ulc2.getHTML() +
+                ulc3.getHTML() +
+                ulc4.getHTML() +
+                ulc5.getHTML() +
+                ulc6.getHTML() +
+                ulc7.getHTML() +
+                ulc8.getHTML() +
+                rect1.getHTML() +
+                rect2.getHTML() +
+                rect3.getHTML() +
+                rect4.getHTML() +
+                rect5.getHTML() +
+                rect_c.getHTML() +
+                rect_s.getHTML() +
+                rect_n.getHTML() +
+                rect_w.getHTML() +
+                rect_e.getHTML() +
+                rect_sw.getHTML() +
+                rect_nw.getHTML() +
+                rect_ne.getHTML() +
+                rect_se.getHTML() +
+                button_1.getHTML() +
+                button_2.getHTML() +
+                button_3.getHTML() +
+                button_4.getHTML() +
+                button_5.getHTML() +
+                button_6.getHTML() +
+                button_7.getHTML() +
+                text_1.getHTML() +
+                text_2.getHTML() +
+                text_3.getHTML() +
+                text_4.getHTML() +
+                text_5.getHTML() +
+                "</svg>";
+                
+                var element = button_1.getElement();
+                element.addEventListener("click", test, false);
+                
+            }
+        
+        
+        function test() {
+            alert("The SVG button click worked!!!!!");
+            b1 = document.getElementById("button_1_text");
+            b1.innerHTML = "Clicked";
+        }
+        
+        </script>
+        
+    </head>
+
+    <body  bgcolor="#000000" onload="init();">
+    </body>
+    
+</html>
+
