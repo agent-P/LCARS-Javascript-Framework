@@ -4,8 +4,8 @@
         <title>SVG Test &mdash; LCARS Shape and Scale Test</title>
         <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
             
-        <script src="../js/LCARS_Components.js"></script>
-        <script src="../js/LCARS_Screens.js"></script>
+        <script src="./js/LCARS_Components.js"></script>
+        <script src="./js/LCARS_Screens.js"></script>
             
         <script language="javascript" type="text/javascript">
         
@@ -21,19 +21,20 @@
         
         var  init = function() {
             
-            testScreen = new LCARSScreen('test', '', '100%', '100%', 0, 0, 1920, 1080);
-            document.body.appendChild(testScreen.element);
+            //testScreen = new LCARSScreen('test', '', '100%', '100%', 0, 0, 1920, 1500);
+            testScreen = new LCARSScreen('test', '', '1920', '1600', 0, 0, 1920, 1500);
+            document.body.appendChild(testScreen.divElement);
             
             ulc = new LCARSCorner("ULC", "Upper Left", 5, 5, 1000, 1, ES_SHAPE_NW | EC_ORANGE | ES_STATIC);
             testScreen.addComponent(ulc);
-            llc = new LCARSCorner("LLC", "Lower Left", 5, 102, 1000, 1, ES_SHAPE_SW | EC_ORANGE | ES_STATIC);
+            llc = new LCARSCorner("LLC", "Lower Left", 5, 102, 1000, 1, ES_SHAPE_SW | EC_ORANGE | ES_STATIC | ES_DISABLED);
             testScreen.addComponent(llc);
-            urc = new LCARSCorner("URC", "Upper Right", 1010, 5, 905, 1, ES_SHAPE_NE | EC_ORANGE | ES_STATIC);
+            urc = new LCARSCorner("URC", "Upper Right", 1010, 5, 905, 1, ES_SHAPE_NE | EC_ORANGE | ES_STATIC | ES_DISABLED);
             testScreen.addComponent(urc);
-            lrc = new LCARSCorner("LRC", "Lower Right", 1010, 102, 905, 1, ES_SHAPE_SE | EC_ORANGE | ES_STATIC);
+            lrc = new LCARSCorner("LRC", "Lower Right", 1010, 102, 905, 1, ES_SHAPE_SE | EC_ORANGE | ES_STATIC | ES_DISABLED);
             testScreen.addComponent(lrc);
             
-            ulc1 = new LCARSCorner("ULC1", "Text", 5, 199, 500, 5, ES_SHAPE_NW | EC_WHITE);
+            ulc1 = new LCARSCorner("ULC1", "Text", 5, 199, 500, 5, ES_SHAPE_NW | EC_WHITE | ES_DISABLED);
             testScreen.addComponent(ulc1);
             ulc2 = new LCARSCorner("ULC2", "Text", 160, 239, 500, 4, ES_SHAPE_NW | EC_L_BLUE);
             testScreen.addComponent(ulc2);
@@ -47,7 +48,7 @@
             testScreen.addComponent(ulc6);
             ulc7 = new LCARSCorner("ULC7", "Text", 960, 439, 500, 1, ES_SHAPE_NW | EC_ORANGE);
             testScreen.addComponent(ulc7);
-            ulc8 = new LCARSCorner("ULC8", "Text", 1120, 479, 500, 1, ES_SHAPE_NW | EC_RED);
+            ulc8 = new LCARSCorner("ULC8", "Text", 1120, 479, 500, 1, ES_SHAPE_NW | EC_RED | ES_DISABLED);
             testScreen.addComponent(ulc8);
             
             rect_1 = new LCARSRectangle("RECT1", "", 10, 575, 1000, 30, EC_ORANGE);
@@ -105,6 +106,19 @@
             testScreen.addComponent(text_4);
             text_5 = new LCARSText("text_5", "LCARS Tiny Text", 1490, 835 + FONT_TINY_SIZE, EF_TINY | EC_ORANGE);
             testScreen.addComponent(text_5);
+            
+            var testListener = function(event) {
+                alert("testListener: " + event.srcElement.id[0]);
+            }
+            
+            keypad = new LCARSKeypad("keypad_1", 20, 1000, EF_SUBTITLE | ES_RECT_RND | EC_ORANGE, EKP_AUX_KEYS | ES_LABEL_SW | EF_BUTTON | EC_BLUE);
+            keypad.addEventListener("click", testListener);
+            keypad.setAuxText("ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "ZERO", "STAR", "HASH");
+            keypad.setButtonAuxText("1", "TEST");
+            testScreen.addComponent(keypad);
+ 
+            //calendar = new LCARSCalendar("calendar test", "LCARS Body Text", 1490, 850 + FONT_BODY_SIZE, EF_BODY | EC_ORANGE);
+            //testScreen.addComponent(calendar);
         }
         </script>
         
