@@ -22,96 +22,96 @@
         var  init = function() {
             
             //testScreen = new LCARSScreen('test', '', '100%', '100%', 0, 0, 1920, 1500);
-            testScreen = new LCARSScreen('test', '', '1920', '1600', 0, 0, 1920, 1500);
+            testScreen = new LCARSScreen('test', 'LCARS COMPONENT TEST SCREEN', '1920', '1600', 0, 0, 1920, 1500);
             document.body.appendChild(testScreen.divElement);
             
-            ulc = new LCARSCorner("ULC", "Upper Left", 5, 5, 1000, 1, ES_SHAPE_NW | EC_ORANGE | ES_STATIC);
+            ulc = new LCARSCorner("ULC", "Upper Left", 5, 100, 1000, 1, ES_SHAPE_NW | EC_ORANGE | ES_STATIC);
             testScreen.addComponent(ulc);
-            llc = new LCARSCorner("LLC", "Lower Left", 5, 102, 1000, 1, ES_SHAPE_SW | EC_ORANGE | ES_STATIC | ES_DISABLED);
+            llc = new LCARSCorner("LLC", "Lower Left", 5, 197, 1000, 1, ES_SHAPE_SW | EC_ORANGE | ES_STATIC);
             testScreen.addComponent(llc);
-            urc = new LCARSCorner("URC", "Upper Right", 1010, 5, 905, 1, ES_SHAPE_NE | EC_ORANGE | ES_STATIC | ES_DISABLED);
+            urc = new LCARSCorner("URC", "Upper Right", 1010, 100, 905, 1, ES_SHAPE_NE | EC_ORANGE | ES_STATIC);
             testScreen.addComponent(urc);
-            lrc = new LCARSCorner("LRC", "Lower Right", 1010, 102, 905, 1, ES_SHAPE_SE | EC_ORANGE | ES_STATIC | ES_DISABLED);
+            lrc = new LCARSCorner("LRC", "Lower Right", 1010, 197, 905, 1, ES_SHAPE_SE | EC_ORANGE | ES_STATIC);
             testScreen.addComponent(lrc);
             
-            ulc1 = new LCARSCorner("ULC1", "Text", 5, 199, 500, 5, ES_SHAPE_NW | EC_WHITE | ES_DISABLED);
+            ulc1 = new LCARSCorner("ULC1", "Text", 5, 299, 500, 5, ES_SHAPE_NW | EC_WHITE);
             testScreen.addComponent(ulc1);
-            ulc2 = new LCARSCorner("ULC2", "Text", 160, 239, 500, 4, ES_SHAPE_NW | EC_L_BLUE);
+            ulc2 = new LCARSCorner("ULC2", "Text", 160, 339, 500, 4, ES_SHAPE_NW | EC_L_BLUE);
             testScreen.addComponent(ulc2);
-            ulc3 = new LCARSCorner("ULC3", "Text", 320, 279, 500, 3, ES_SHAPE_NW | EC_M_BLUE);
+            ulc3 = new LCARSCorner("ULC3", "Text", 320, 379, 500, 3, ES_SHAPE_NW | EC_M_BLUE);
             testScreen.addComponent(ulc3);
-            ulc4 = new LCARSCorner("ULC4", "Text", 480, 319, 500, 2, ES_SHAPE_NW | EC_BLUE);
+            ulc4 = new LCARSCorner("ULC4", "Text", 480, 419, 500, 2, ES_SHAPE_NW | EC_BLUE);
             testScreen.addComponent(ulc4);
-            ulc5 = new LCARSCorner("ULC5", "Text", 640, 359, 500, 1, ES_SHAPE_NW | EC_D_BLUE);
+            ulc5 = new LCARSCorner("ULC5", "Text", 640, 459, 500, 1, ES_SHAPE_NW | EC_D_BLUE);
             testScreen.addComponent(ulc5);
-            ulc6 = new LCARSCorner("ULC6", "Text", 800, 399, 500, 1, ES_SHAPE_NW | EC_YELLOW);
+            ulc6 = new LCARSCorner("ULC6", "Text", 800, 499, 500, 1, ES_SHAPE_NW | EC_YELLOW);
             testScreen.addComponent(ulc6);
-            ulc7 = new LCARSCorner("ULC7", "Text", 960, 439, 500, 1, ES_SHAPE_NW | EC_ORANGE);
+            ulc7 = new LCARSCorner("ULC7", "Text", 960, 539, 500, 1, ES_SHAPE_NW | EC_ORANGE);
             testScreen.addComponent(ulc7);
-            ulc8 = new LCARSCorner("ULC8", "Text", 1120, 479, 500, 1, ES_SHAPE_NW | EC_RED | ES_DISABLED);
+            ulc8 = new LCARSCorner("ULC8", "Text", 1120, 579, 500, 1, ES_SHAPE_NW | EC_RED);
             testScreen.addComponent(ulc8);
             
-            rect_1 = new LCARSRectangle("RECT1", "", 10, 575, 1000, 30, EC_ORANGE);
+            rect_1 = new LCARSRectangle("RECT1", "", 10, 675, 1000, 30, EC_ORANGE);
             testScreen.addComponent(rect_1);
-            rect_2 = new LCARSRectangle("RECT2", "rect2", 10, 650, 150, 60, EC_ORANGE);
+            rect_2 = new LCARSRectangle("RECT2", "rect2", 10, 750, 150, 60, EC_ORANGE);
             testScreen.addComponent(rect_2);
-            rect_3 = new LCARSRectangle("RECT3", "rect3", 10, 720, 150, 60, ES_RECT_RND | EC_ORANGE);
+            rect_3 = new LCARSRectangle("RECT3", "rect3", 10, 820, 150, 60, ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_3);
-            rect_4 = new LCARSRectangle("RECT4", "rect4", 10, 790, 150, 60, ES_RECT_RND_W | EC_ORANGE);
+            rect_4 = new LCARSRectangle("RECT4", "rect4", 10, 890, 150, 60, ES_RECT_RND_W | EC_ORANGE);
             testScreen.addComponent(rect_4);
-            rect_5 = new LCARSRectangle("RECT5", "rect5", 10, 860, 150, 60, ES_RECT_RND_E | EC_ORANGE);
+            rect_5 = new LCARSRectangle("RECT5", "rect5", 10, 960, 150, 60, ES_RECT_RND_E | EC_ORANGE);
             testScreen.addComponent(rect_5);
             
-            rect_c = new LCARSRectangle("rect_c", "CENTER", 500, 790, 150, 60, ES_LABEL_C | ES_RECT_RND | EC_ORANGE);
+            rect_c = new LCARSRectangle("rect_c", "CENTER", 500, 890, 150, 60, ES_LABEL_C | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_c);
-            rect_s = new LCARSRectangle("rect_s", "South", 500, 860, 150, 60, ES_LABEL_S | ES_RECT_RND | EC_ORANGE);
+            rect_s = new LCARSRectangle("rect_s", "South", 500, 960, 150, 60, ES_LABEL_S | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_s);
-            rect_sw = new LCARSRectangle("rect_sw", "Southwest", 345, 860, 150, 60, ES_LABEL_SW | ES_RECT_RND | EC_ORANGE);
+            rect_sw = new LCARSRectangle("rect_sw", "Southwest", 345, 960, 150, 60, ES_LABEL_SW | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_sw);
-            rect_w = new LCARSRectangle("rect_w", "West", 345, 790, 150, 60, ES_LABEL_W | ES_RECT_RND | EC_ORANGE);
+            rect_w = new LCARSRectangle("rect_w", "West", 345, 890, 150, 60, ES_LABEL_W | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_w);
-            rect_nw = new LCARSRectangle("rect_nw", "Northwest", 345, 720, 150, 60, ES_LABEL_NW | ES_RECT_RND | EC_ORANGE);
+            rect_nw = new LCARSRectangle("rect_nw", "Northwest", 345, 820, 150, 60, ES_LABEL_NW | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_nw);
-            rect_n = new LCARSRectangle("rect_n", "North", 500, 720, 150, 60, ES_LABEL_N | ES_RECT_RND | EC_ORANGE);
+            rect_n = new LCARSRectangle("rect_n", "North", 500, 820, 150, 60, ES_LABEL_N | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_n);
-            rect_ne = new LCARSRectangle("rect_ne", "Northeast", 655, 720, 150, 60, ES_LABEL_NE | ES_RECT_RND | EC_ORANGE);
+            rect_ne = new LCARSRectangle("rect_ne", "Northeast", 655, 820, 150, 60, ES_LABEL_NE | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_ne);
-            rect_e = new LCARSRectangle("rect_e", "East", 655, 790, 150, 60, ES_LABEL_E | ES_RECT_RND | EC_ORANGE);
+            rect_e = new LCARSRectangle("rect_e", "East", 655, 890, 150, 60, ES_LABEL_E | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_e);
-            rect_se = new LCARSRectangle("rect_se", "Southeast", 655, 860, 150, 60, ES_LABEL_SE | ES_RECT_RND | EC_ORANGE);
+            rect_se = new LCARSRectangle("rect_se", "Southeast", 655, 960, 150, 60, ES_LABEL_SE | ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(rect_se);
             
-            button_1 = new LCARSButton("button_1", "Button 1", 850, 650, 1, EC_ORANGE);
+            button_1 = new LCARSButton("button_1", "Button 1", 850, 750, 1, EC_ORANGE);
             testScreen.addComponent(button_1);
-            button_2 = new LCARSButton("button_2", "Button 2", 1005, 650, 2, EC_ORANGE);
+            button_2 = new LCARSButton("button_2", "Button 2", 1005, 750, 2, EC_ORANGE);
             testScreen.addComponent(button_2);
-            button_3 = new LCARSButton("button_3", "Button 3", 1160, 650, 3, EC_ORANGE);
+            button_3 = new LCARSButton("button_3", "Button 3", 1160, 750, 3, EC_ORANGE);
             testScreen.addComponent(button_3);
-            button_4 = new LCARSButton("button_4", "Button 4", 1315, 650, 4, EC_ORANGE);
+            button_4 = new LCARSButton("button_4", "Button 4", 1315, 750, 4, EC_ORANGE);
             testScreen.addComponent(button_4);
-            button_5 = new LCARSButton("button_5", "Button 5", 850, 845, 0, ES_RECT_RND | EC_ORANGE);
+            button_5 = new LCARSButton("button_5", "Button 5", 850, 945, 0, ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(button_5);
-            button_6 = new LCARSButton("button_6", "Button 6", 1005, 845, 0, ES_RECT_RND | EC_ORANGE);
+            button_6 = new LCARSButton("button_6", "Button 6", 1005, 945, 0, ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(button_6);
-            button_7 = new LCARSButton("button_7", "Button 7", 1160, 845, 0, ES_RECT_RND | EC_ORANGE);
+            button_7 = new LCARSButton("button_7", "Button 7", 1160, 945, 0, ES_RECT_RND | EC_ORANGE);
             testScreen.addComponent(button_7);
             
-            text_1 = new LCARSText("text_1", "LCARS Title Text", 1490, 650 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE);
+            text_1 = new LCARSText("text_1", "LCARS Title Text", 1490, 750 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE);
             testScreen.addComponent(text_1);
-            text_2 = new LCARSText("text_2", "LCARS Subtitle Text", 1490, 720 + FONT_SUBTITLE_SIZE, EF_SUBTITLE | EC_ORANGE);
+            text_2 = new LCARSText("text_2", "LCARS Subtitle Text", 1490, 820 + FONT_SUBTITLE_SIZE, EF_SUBTITLE | EC_ORANGE);
             testScreen.addComponent(text_2);
-            text_3 = new LCARSText("text_3", "LCARS Button Text", 1490, 770 + FONT_BUTTON_SIZE, EF_BUTTON | EC_ORANGE);
+            text_3 = new LCARSText("text_3", "LCARS Button Text", 1490, 870 + FONT_BUTTON_SIZE, EF_BUTTON | EC_ORANGE);
             testScreen.addComponent(text_3);
-            text_4 = new LCARSText("text_4", "LCARS Body Text", 1490, 805 + FONT_BODY_SIZE, EF_BODY | EC_ORANGE);
+            text_4 = new LCARSText("text_4", "LCARS Body Text", 1490, 905 + FONT_BODY_SIZE, EF_BODY | EC_ORANGE);
             testScreen.addComponent(text_4);
-            text_5 = new LCARSText("text_5", "LCARS Tiny Text", 1490, 835 + FONT_TINY_SIZE, EF_TINY | EC_ORANGE);
+            text_5 = new LCARSText("text_5", "LCARS Tiny Text", 1490, 935 + FONT_TINY_SIZE, EF_TINY | EC_ORANGE);
             testScreen.addComponent(text_5);
             
             var testListener = function(event) {
                 alert("testListener: " + event.srcElement.id[0]);
             }
             
-            keypad = new LCARSKeypad("keypad_1", 20, 1000, EF_SUBTITLE | ES_RECT_RND | EC_ORANGE, EKP_AUX_KEYS | ES_LABEL_SW | EF_BUTTON | EC_BLUE);
+            keypad = new LCARSKeypad("keypad_1", 20, 1100, EF_SUBTITLE | ES_RECT_RND | EC_ORANGE, EKP_AUX_KEYS | ES_LABEL_SW | EF_BUTTON | EC_BLUE);
             keypad.addEventListener("click", testListener);
             keypad.setAuxText("ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "ZERO", "STAR", "HASH");
             keypad.setButtonAuxText("1", "TEST");
