@@ -10,7 +10,7 @@ A javascript framework for building LCARS displays in web browsers. It uses an a
 * LCARSKeypad
 * LCARSCalendar (in progress)
 
-The file <code>LCARSScreenBuildingTest.html<code/> demonstrates how the components can be used. See the following image for visual of Component types and color palette.
+The file <code>LCARSScreenBuildingTest.html</code> demonstrates how the components can be used. See the following image for visual of Component types and color palette.
 
 ##### LCARS Component Test Screen
 
