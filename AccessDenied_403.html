@@ -1,0 +1,171 @@
+<html>
+    
+    <head>
+        <title>LCARS Security System</title>
+        <link rel="apple-touch-icon" href="./img/apple-touch-icon.png"/>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+        <meta name = "viewport" content = "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+            
+
+        <script src="./js/LCARS_Components.js"></script>
+        <script src="./js/LCARS_Screens_iPhone.js"></script>
+        <script language="javascript" type="text/javascript">
+       
+       var host = window.location.hostname;
+       
+       var portraitDivElement;
+       var landscapeDivElement;
+       
+       var portraitScreen;
+       var landscapeScreen;
+       
+        /**
+         * The application initialization function ************************************************
+         */
+        var  init = function() {
+            if(navigator.userAgent.indexOf("iPhone") != -1 || navigator.userAgent.indexOf("iPad") != -1) {
+                LCARS.setFont(LCARS_FONT_MOBILE);
+            }
+            else {
+                LCARS.setFont(LCARS_FONT);
+            }
+            
+            portraitScreen = new LCARSScreen('_portrait', '', 705, 1015, 0, 0, 640, 1136);
+            portraitScreen.divElement.style.border = "1px solid blue";
+            portraitScreen.setTransform('scale(0.45) translateX(-440px) translateY(-575px)');
+            document.body.appendChild(portraitScreen.divElement);
+            
+            landscapeScreen = new LCARSScreen('_landscape', '', 970, 550, 0, 0, 1136, 640);
+            landscapeScreen.divElement.style.border = "1px solid white";
+            landscapeScreen.setTransform('scale(0.58) translateX(-355px) translateY(-200px)');
+            document.body.appendChild(landscapeScreen.divElement);
+            
+            updateOrientation();
+
+
+            /**
+             * Portrait Screen
+             */
+            hb_end_cap_w = new LCARSRectangle("hb_end_cap_w", "", 10, 5, 20, 30, ES_RECT_RND_W | EC_ORANGE);
+            portraitScreen.addComponent(hb_end_cap_w);
+
+            rect_title_bar = new LCARSRectangle("rect_title_bar", "", 35, 5, 385, 30, EC_ORANGE);
+            portraitScreen.addComponent(rect_title_bar);
+
+            text_title = new LCARSText("text_title", "403 - FORBIDDEN", 425, FONT_SUBTITLE_SIZE -7 , EF_SUBTITLE | EC_ORANGE);
+            portraitScreen.addComponent(text_title);
+
+            hb_end_cap_e = new LCARSRectangle("hb_end_cap_e", "", 680, 5, 20, 30, ES_RECT_RND_E | EC_ORANGE);
+            portraitScreen.addComponent(hb_end_cap_e);
+            
+            
+            text_message = new LCARSText("text_message", "ACCESS DENIED", 50, 350 , EF_TITLE | EC_RED);
+            text_message.setTextFontSize(110);
+            portraitScreen.addComponent(text_message);
+            
+            text_message_sub_1 = new LCARSText("text_message_sub_1", "DEVICE ID: NOT VERIFIED", 300, 500 , EF_SUBTITLE | EC_RED);
+            portraitScreen.addComponent(text_message_sub_1);
+            
+            text_message_sub_2 = new LCARSText("text_message_sub_2", "ERROR: 403 - FORBIDDEN", 300, 550 , EF_SUBTITLE | EC_RED);
+            portraitScreen.addComponent(text_message_sub_2);
+            
+            text_message_sub_3 = new LCARSText("text_message_sub_3", "SYSTEM ID: " + host, 300, 600 , EF_SUBTITLE | EC_RED);
+            portraitScreen.addComponent(text_message_sub_3);
+
+
+            fb_end_cap_w = new LCARSRectangle("fb_end_cap_w", "", 10, 975, 20, 30, ES_RECT_RND_W | EC_ORANGE);
+            portraitScreen.addComponent(fb_end_cap_w);
+
+            rect_footer_bar = new LCARSRectangle("rect_footer_bar", "", 35, 975, 640, 30, EC_ORANGE);
+            portraitScreen.addComponent(rect_footer_bar);
+
+            fb_end_cap_e = new LCARSRectangle("fb_end_cap_e", "", 680, 975, 20, 30, ES_RECT_RND_E | EC_ORANGE);
+            portraitScreen.addComponent(fb_end_cap_e);
+
+
+            /**
+             * Landscape Screen
+             */
+            l_hb_end_cap_w = new LCARSRectangle("l_hb_end_cap_w", "", 10, 5, 20, 30, ES_RECT_RND_W | EC_ORANGE);
+            landscapeScreen.addComponent(l_hb_end_cap_w);
+
+            l_rect_title_bar = new LCARSRectangle("l_rect_title_bar", "", 35, 5, 650, 30, EC_ORANGE);
+            landscapeScreen.addComponent(l_rect_title_bar);
+            
+            l_text_title = new LCARSText("l_text_title", "403 - FORBIDDEN", 690, FONT_SUBTITLE_SIZE -7 , EF_SUBTITLE | EC_ORANGE);
+            landscapeScreen.addComponent(l_text_title);
+
+            l_hb_end_cap_e = new LCARSRectangle("l_hb_end_cap_e", "", 940, 5, 20, 30, ES_RECT_RND_E | EC_ORANGE);
+            landscapeScreen.addComponent(l_hb_end_cap_e);
+
+
+            l_text_message = new LCARSText("l_text_message", "ACCESS DENIED", 250, 200 , EF_TITLE | EC_RED);
+            l_text_message.setTextFontSize(90);
+            landscapeScreen.addComponent(l_text_message);
+
+            l_text_message_sub_1 = new LCARSText("l_text_message_sub_1", "DEVICE ID: NOT VERIFIED", 375, 300 , EF_SUBTITLE | EC_RED);
+            landscapeScreen.addComponent(l_text_message_sub_1);
+
+            l_text_message_sub_2 = new LCARSText("l_text_message_sub_2", "ERROR: 403 - FORBIDDEN", 375, 350 , EF_SUBTITLE | EC_RED);
+            landscapeScreen.addComponent(l_text_message_sub_2);
+
+            l_text_message_sub_3 = new LCARSText("tl_ext_message_sub_3", "SYSTEM ID: " + host, 375, 400 , EF_SUBTITLE | EC_RED);
+            landscapeScreen.addComponent(l_text_message_sub_3);
+
+
+            l_fb_end_cap_w = new LCARSRectangle("l_fb_end_cap_w", "", 10, 515, 20, 30, ES_RECT_RND_W | EC_ORANGE);
+            landscapeScreen.addComponent(l_fb_end_cap_w);
+
+            l_rect_footer_bar = new LCARSRectangle("l_rect_footer_bar", "", 35, 515, 900, 30, EC_ORANGE);
+            landscapeScreen.addComponent(l_rect_footer_bar);
+
+            l_fb_end_cap_e = new LCARSRectangle("l_fb_end_cap_e", "", 940, 515, 20, 30, ES_RECT_RND_E | EC_ORANGE);
+            landscapeScreen.addComponent(l_fb_end_cap_e);
+
+
+
+        }
+        
+        
+        /**
+         * Update the display based on the orientation of the device. Note the 180 degree case
+         * is not detected in iOS 8.x.
+         *    0: portrait screen is visible, landscape screen is hidden
+         *   90: portrait screen is hidden, landscape screen is visible
+         *  -90: portrait screen is hidden, landscape screen is visible
+         *  180: no screen change, last screen remains
+         */
+        var updateOrientation = function() {
+            switch(window.orientation) {
+                case 0:
+                portraitScreen.divElement.style.visibility = 'visible';
+                landscapeScreen.divElement.style.visibility = 'hidden';
+                break;
+                case -90:
+                portraitScreen.divElement.style.visibility = 'hidden';
+                landscapeScreen.divElement.style.visibility = 'visible';
+                break;
+                case 90:
+                portraitScreen.divElement.style.visibility = 'hidden';
+                landscapeScreen.divElement.style.visibility = 'visible';
+                break;
+                case 180:
+                portraitScreen.divElement.style.visibility = 'visible';
+                landscapeScreen.divElement.style.visibility = 'hidden';
+                break;
+                default:
+                break;
+            }
+        }
+        </script>
+        
+    </head>
+
+    <body  bgcolor="#000000" onload="init();" onorientationchange="updateOrientation();">
+        
+    </body>
+    
+</html>
+

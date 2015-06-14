@@ -19,6 +19,10 @@
         var button_6;
         var button_7;
         
+        var scrollTestInterval;
+        var scrollingTextArea;
+        var count = 0;
+        
         var  init = function() {
             
             //testScreen = new LCARSScreen('test', '', '100%', '100%', 0, 0, 1920, 1500);
@@ -111,14 +115,50 @@
                 alert("testListener: " + event.srcElement.id[0]);
             }
             
+            
+            caption_keypad = new LCARSText("caption_keypad", "Keypad Test", 30, 1100 - 10, EF_BUTTON | EC_ORANGE);
+            testScreen.addComponent(caption_keypad);
+            
             keypad = new LCARSKeypad("keypad_1", 20, 1100, EF_SUBTITLE | ES_RECT_RND | EC_ORANGE, EKP_AUX_KEYS | ES_LABEL_SW | EF_BUTTON | EC_BLUE);
             keypad.addEventListener("click", testListener);
             keypad.setAuxText("ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "ZERO", "STAR", "HASH");
             keypad.setButtonAuxText("1", "TEST");
             testScreen.addComponent(keypad);
+            
+            rect_text_width = new LCARSRectangle("rect_text_width", "", 600, 1100-5, 600, 5, EC_ORANGE);
+            testScreen.addComponent(rect_text_width);
+            caption_textarea = new LCARSText("caption_textarea", "Text Area Wrap Test", 600, 1100 - 10, EF_BUTTON | EC_ORANGE);
+            testScreen.addComponent(caption_textarea);
+            
+            textArea = new LCARSTextArea("textArea", "", 600, 1100, 600, 10, EF_BODY | EC_ORANGE);
+            testScreen.addComponent(textArea);
+            
+            textArea.setNoWrap(false);
+            textArea.appendLine("Ne malis tractatos vel. Mucius labores id mei. Per at purto sententiae appellantur. Id cibo vivendo epicuri nec. Nibh munere no mei, populo accusam vix ut, at mei epicuri dignissim. Prima laudem pri te.");
+            textArea.appendLine(" ");
+            textArea.appendLine("Eu mel regione luptatum adolescens, vim error graece ne, eu sea possim consectetuer. Id has copiosae praesent forensibus, bonorum qualisque sententiae nec in. Gubergren efficiantur te usu. Veniam aliquando repudiandae in nam, eu vel vituperata appellantur, eu civibus referrentur sit. Eius labores has an, per ea saperet nusquam indoctum. Est fugit forensibus ei. Appareat partiendo ut pro, at vocibus postulant pri, ea meis alienum accusamus cum.");
+            
+            
+            caption_scrolling_textarea = new LCARSText("caption_scrolling_textarea", "Scrolling Text Area Test", 1490, 1100 - 10, EF_BUTTON | EC_ORANGE);
+            testScreen.addComponent(caption_scrolling_textarea);
+            
+            scrollingTextArea = new LCARSTextArea("scrollingTextArea", "", 1490, 1100, 400, 10, EF_BUTTON | EC_ORANGE);
+            testScreen.addComponent(scrollingTextArea);
+            
+            scrollingTextArea.setNoWrap(false);
+            
+            scrollTestInterval = setInterval(function() { textAreaScrollTest() }, 1000);
+            
  
             //calendar = new LCARSCalendar("calendar test", "LCARS Body Text", 1490, 850 + FONT_BODY_SIZE, EF_BODY | EC_ORANGE);
             //testScreen.addComponent(calendar);
+        }
+        
+        
+        var textAreaScrollTest = function () {
+            
+            scrollingTextArea.appendLine("added line " + count + " to test scrolling...");
+            count += 1;
         }
         </script>
         

@@ -163,7 +163,24 @@ LCARS.getFont = function() {
     return this.font;
 }
 
+/**
+ * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
+ *
+ * @param {String} text The text to be rendered.
+ * @param {String} font The css font descriptor that text is to be rendered with (e.g. "Arial Narrow").
+ */
+LCARS.getTextWidth  = function(text, font) {
+    canvas = document.createElement("canvas");
+    var context = canvas.getContext("2d");
+    context.font = font;
+    var metrics = context.measureText(text);
+    return metrics.width;
+}
 
+
+/**
+ * LCARSComponent class
+ */
 LCARSComponent = function(id, label, x, y, properties) {
     if(id != undefined) { /** Prevent execution when used for inheritence and not instantiation. */
         this.composite = false;
@@ -515,6 +532,11 @@ LCARSComponent.prototype.setText = function(textString) {
 }
 
 
+LCARSComponent.prototype.setTextFontSize = function(textFontSize) {
+    this.textElement.setAttribute("font-size", textFontSize);
+}
+
+
 LCARSComponent.prototype.setVisible = function(visible) {
     if(visible) {
         this.element.setAttributeNS(null, 'display', 'inline');
@@ -526,6 +548,9 @@ LCARSComponent.prototype.setVisible = function(visible) {
 
 
 
+/** 
+ * LCARSCorner component
+ */
 LCARSCorner.prototype = new LCARSComponent();
 function LCARSCorner(name, label, x, y, width, height, properties) {
     LCARSComponent.call(this, name, label, x, y, properties);
@@ -1188,17 +1213,19 @@ LCARSCalendar.prototype.drawText = function() {
  * LCARS TextArea component
  */
 LCARSTextArea.prototype = new LCARSComponent();
-function LCARSTextArea(name, label, x, y, columns, rows, properties) {
+function LCARSTextArea(name, label, x, y, width, rows, properties) {
     LCARSComponent.call(this, name, label, x, y, properties);
-    this.composite = true;
+    this.composite = false;
     this.static = ES_STATIC;  // TextAreas are always static.
     this.textColor = this.getColor();
     
-    this.columns = columns;
+    this.width = width;
     this.rows = rows;
     
-    //this.drawText();
-    this.drawShape();
+    this.nowrap = true;  // Default to not wrapping lines of text
+    this.canvasFont = Math.round(this.fontSize*0.75) + "pt " + LCARS.getFont();
+    
+    this.drawText();
 }
 
 LCARSTextArea.prototype.getTextAnchor = function() {
@@ -1209,32 +1236,154 @@ LCARSTextArea.prototype.getTextAnchor = function() {
     return LCARSComponent.prototype.getTextAnchor.call(this);
 }
 
-LCARSTextArea.prototype.drawShape = function() {
-    
-    this.divElement = document.createElement("div");
-    this.divElement.style.top = this.y + "px";
-    this.divElement.style.left = this.x + "px";
-    this.divElement.style.position = "absolute";
-    
-    this.textAreaElement = document.createElement("textarea");
-    this.textAreaElement.name = "post";
-    this.textAreaElement.style.border = "0px solid black";
-    this.textAreaElement.maxLength = "5000";
-    this.textAreaElement.cols = this.columns;
-    this.textAreaElement.rows = this.rows;
-    this.textAreaElement.readonly = true;
-    this.textAreaElement.style.backgroundColor = "black";
-    this.textAreaElement.style.color = this.textColor;
-    this.textAreaElement.style.fontFamily = LCARS.getFont();
-    this.textAreaElement.style.fontSize = "2em";
-    
-    this.divElement.appendChild(this.textAreaElement); //appendChild
+LCARSTextArea.prototype.drawText = function() {
+    this.textAreaElement = document.createElementNS(svgNS, "text");
+    this.textAreaElement.setAttribute("id", this.id + TEXT_SUFFIX);
 
+    this.lineElements = [];
+    for(index = 0; index < this.rows; index++) {
+        this.lineElements.push(document.createElementNS(svgNS, "tspan"));
+        this.lineElements[index].setAttribute("id", this.id + "_" + index + TEXT_SUFFIX);
+        this.lineElements[index].setAttribute("fill", this.textColor);
+        this.lineElements[index].setAttribute("font-family", LCARS.getFont());
+        this.lineElements[index].setAttribute("font-size", this.fontSize);
+        this.lineElements[index].setAttribute("x", 0);
+        this.lineElements[index].setAttribute("dy", this.fontSize);
+        
+        /** Set <code>tspan</code> attribute to preserve the space for blank lines, and initialize
+         the line as blank. */
+        this.lineElements[index].setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:space","preserve");
+        this.lineElements[index].textContent = "";
+
+        /** Add the <code>tspan</code> SVG element to the parent SVG <code>textAreaElement</code>. */
+        this.textAreaElement.appendChild(this.lineElements[index]);
+    }
+    
+    this.element.appendChild(this.textAreaElement);
+    
     return "";
 }
 
-LCARSTextArea.prototype.appendLine = function(lineOfText) {
 
+LCARSTextArea.prototype.appendLine = function(lineOfText) {
+    
+    var resultString = this.wrap(lineOfText);
+    var resultStringLength = resultString.length;
+    
+    for(var index = 0; index < resultStringLength; index++) {
+        this.addLine(resultString[index]);
+    }
+}
+
+
+LCARSTextArea.prototype.addLine = function(lineOfText) {
+    
+    for(index = 0; index < this.rows; index++) {
+        if(this.lineElements[index] == "") {
+            this.lineElements[index].textContent = lineOfText;
+        }
+        else {
+            this.scrollUp();
+            this.lineElements[this.rows-1].textContent = lineOfText;
+        }
+    }
+}
+
+
+LCARSTextArea.prototype.wrap = function(lineOfText) {
+    var resultStrings = [];
+    
+    if(this.nowrap == true) {
+        /** If nowrap is specified trim the string to the supported width,
+         and return it. */
+        resultStrings.push(this.truncate(lineOfText));
+    }
+    else {
+        var words = lineOfText.split(' ');
+        var w, x, i, l;
+        var spaceWidth = LCARS.getTextWidth(' ', this.canvasFont);
+        var spaceLeft = this.width;
+        
+        var line = [];
+        resultStrings.push(line);
+        
+        for( i = 0, l = words.length; i < l; i++ ) {
+            w = words[i];
+            x = LCARS.getTextWidth(w, this.canvasFont) + spaceWidth;
+            
+            if( x > spaceLeft ) {
+                line = [];
+                resultStrings.push(line);
+                line.push(w);
+                spaceLeft = this.width - x;
+            }
+            else {
+                spaceLeft = spaceLeft - x;
+                line.push(w);
+            }
+        }
+        
+        for( i = 0, l = resultStrings.length; i < l; i++ ) {
+            resultStrings[i] = resultStrings[i].join(' ');
+        }
+    }
+    
+    return resultStrings;
+}
+
+
+LCARSTextArea.prototype.truncate = function(lineOfText) {
+    var resultString = [];
+    var canvasFont = Math.round(this.fontSize*0.49) + "pt " + LCARS.getFont();
+    
+    var i = 0;
+    while(LCARS.getTextWidth(resultString, canvasFont) < this.width) {
+        resultString[i] = lineOfText[i];
+        i++;
+    }
+    
+    return resultString.join('');
+}
+
+LCARSTextArea.prototype.setNoWrap = function(nowrap) {
+    this.nowrap = nowrap;
+}
+
+
+LCARSTextArea.prototype.initTextArea = function() {
+    for(index = 0; index < this.rows; index++) {
+        this.lineElements[index].textContent = " ";
+    }
+}
+
+
+LCARSTextArea.prototype.setText = function(index, lineOfText) {
+    this.lineElements[index].textContent = lineOfText;
+}
+
+
+LCARSTextArea.prototype.clearText = function(index) {
+    this.lineElements[index].textContent = " ";
+}
+
+
+LCARSTextArea.prototype.clearTextArea = function() {
+    for(index = 0; index < this.rows; index++) {
+        this.lineElements[index].textContent = "";
+    }
+}
+
+
+LCARSTextArea.prototype.scrollUp = function() {
+    for(index = 0; index < this.rows-1; index++) {
+        this.lineElements[index].textContent = this.lineElements[index+1].textContent;
+    }
+    
+    this.lineElements[this.rows-1].textContent = "";
+}
+
+
+LCARSTextArea.prototype._appendLine = function(lineOfText) {
     var total = ((this.textAreaElement.value ? this.textAreaElement.value + "\n" : "") + lineOfText).split("\n");
     
     if(total.length > this.rows) {
@@ -1243,6 +1392,7 @@ LCARSTextArea.prototype.appendLine = function(lineOfText) {
     
     this.textAreaElement.value = total.join("\n");
 }
+
 
 LCARSTextArea.prototype.getTextX = function() {
     return 0;
