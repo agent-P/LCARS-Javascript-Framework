@@ -1,0 +1,84 @@
+<html>
+    
+    <head>
+        <title>SVG Test &mdash; LCARS Shape and Scale Test</title>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+            
+        <script src="./js/LCARS_Components.js"></script>
+        <script src="./js/LCARS_Screens.js"></script>
+            
+            <style>
+                @font-face {
+                    font-family: "LCARS";
+                    src: url(./Antonio-Light.ttf) format("truetype");
+                }
+            </style>
+            
+        <script language="javascript" type="text/javascript">
+        
+        var testScreen;
+        
+        var button_1;
+        var button_2;
+        var button_3;
+        var button_4;
+        var button_5;
+        var button_6;
+        var button_7;
+        
+        var scrollTestInterval;
+        var scrollingTextArea;
+        var count = 0;
+        
+        var  init = function() {
+            
+            LCARS.setFont("LCARS");
+            
+            testScreen = new LCARSBlankScreen('test', 'LCARS COMPONENT TEST SCREEN', 1920, 1550);
+            testScreen.setViewBox(0, 0, 1920, 1550);
+            document.body.appendChild(testScreen.element);
+            
+            ulc = new LCARSCorner("ULC", "", 5, 100, 1000, 1, ES_SHAPE_NW | EC_ORANGE | ES_STATIC);
+            testScreen.addComponent(ulc);
+            llc = new LCARSCorner("LLC", "", 5, 197, 1000, 1, ES_SHAPE_SW | EC_ORANGE | ES_STATIC);
+            testScreen.addComponent(llc);
+            urc = new LCARSCorner("URC", "", 1010, 100, 905, 1, ES_SHAPE_NE | EC_ORANGE | ES_STATIC);
+            testScreen.addComponent(urc);
+            lrc = new LCARSCorner("LRC", "", 1010, 197, 905, 1, ES_SHAPE_SE | EC_ORANGE | ES_STATIC);
+            testScreen.addComponent(lrc);
+            
+            clock_1 = new LCARSClock("clock_1", "LCARS clock_1 Text", 200, 175 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 500, "dddd h:mm:ss TT d MMM yyyy Z K");
+            testScreen.addComponent(clock_1);
+            
+            clock_1.setTextFontSize(100);
+            
+            
+            clock_2 = new LCARSClock("clock_2", "LCARS clock_2 Text", 200, 475 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 500, "h:mm:ss");
+            testScreen.addComponent(clock_2);
+            
+            clock_2.setTextFontSize(100);
+            
+
+ 
+            calendar = new LCARSCalendar("calendar test", 10, 600, 75, 3);
+            testScreen.addComponent(calendar);
+            
+            //calendar.incrementYear();
+            //calendar.startAutoUpdate();
+        }
+        
+        
+        var textAreaScrollTest = function () {
+            
+            scrollingTextArea.appendLine("added line " + count + " to test scrolling...");
+            count += 1;
+        }
+        </script>
+        
+    </head>
+
+    <body  bgcolor="#000000" onload="init();">
+    </body>
+    
+</html>
+

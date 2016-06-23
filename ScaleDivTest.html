@@ -1,0 +1,92 @@
+<html>
+    
+    <head>
+        <title>LCARS Security System</title>
+        <link rel="apple-touch-icon" href="./img/apple-touch-icon.png"/>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+        <meta name = "viewport" content = "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+            
+
+        <script language="javascript" type="text/javascript">
+       
+       
+       var portraitDivElement;
+       var landscapeDivElement;
+       
+        /**
+         * The application initialization function ************************************************
+         */
+        var  init = function() {
+            portraitDivElement = document.createElement("div");
+            landscapeDivElement = document.createElement("div");
+            
+            portraitDivElement.style.border = "1px solid blue";
+            landscapeDivElement.style.border = "1px solid white";
+            
+            portraitDivElement.style.position = "absolute";
+            portraitDivElement.style.width = "310px";
+            portraitDivElement.style.height = "558px";
+            portraitDivElement.style.top = "5px";
+            portraitDivElement.style.left = "5px";
+            
+            landscapeDivElement.style.position = "absolute";
+            landscapeDivElement.style.width = "560px";
+            landscapeDivElement.style.height = "310px";
+            landscapeDivElement.style.top = "5px";
+            landscapeDivElement.style.left = "5px";
+            
+            
+            document.body.appendChild(portraitDivElement);
+            document.body.appendChild(landscapeDivElement);
+
+        }
+        
+        
+        /**
+         * Update the display based on the orientation of the device. Note the 180 degree case
+         * is not detected in iOS 8.x.
+         *    0: portrait screen is visible, landscape screen is hidden
+         *   90: portrait screen is hidden, landscape screen is visible
+         *  -90: portrait screen is hidden, landscape screen is visible
+         *  180: no screen change, last screen remains
+         */
+        var updateOrientation = function() {
+//            alert(window.screen.width + ", " + window.screen.height);
+//            alert(window.orientation);
+            switch(window.orientation) {
+                case 0:
+                    portraitDivElement.style.visibility = 'visible';
+                    landscapeDivElement.style.visibility = 'hidden';
+                    //alert(window.orientation);
+                    break;
+                case -90:
+                    portraitDivElement.style.visibility = 'hidden';
+                    landscapeDivElement.style.visibility = 'visible';
+                    //alert(window.orientation);
+                    break;
+                case 90:
+                    portraitDivElement.style.visibility = 'hidden';
+                    landscapeDivElement.style.visibility = 'visible';
+                    //alert(window.orientation);
+                    break;
+                case 180:
+                    portraitDivElement.style.visibility = 'visible';
+                    landscapeDivElement.style.visibility = 'hidden';
+                    //alert(window.orientation);
+                    break;
+                default:
+                    break;
+            }
+        }
+        </script>
+        
+    </head>
+
+    <body  bgcolor="#000000" onload="init();" onorientationchange="updateOrientation();">
+        
+    </body>
+    
+</html>
+

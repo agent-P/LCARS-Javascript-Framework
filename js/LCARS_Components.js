@@ -101,6 +101,7 @@ const TEXT_X_INSET = 20;
 const LCARS_BTN_HEIGHT    = 60;
 const LCARS_BTN_WIDTH     = 150;
 const LCARS_BTN_SPACING   = 5;
+const LCARS_SPACE         = 5;
 const LCARS_CORNER_HEIGHT = 92;
 
 const SHAPE_SUFFIX = "_shape";
@@ -109,20 +110,58 @@ const AUX_TEXT_SUFFIX = "_aux_text";
 
 const DAYS = [ 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
 const MONTHS = [
-    "",                               /** MONTHS[1] = "January" */
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-];
+                "\x00",          /** substitution token to support parsing */
+                "January",       /** MONTHS[1] = "January" */
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+                ];
+
+const MONTHS_ABBREVIATED = [
+                "\x01",          /** substitution token to support parsing */
+                "Jan",           /** MONTHS_ABBREVIATED[1] = "Jan" */
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+                ];
+
+const DAYS_OF_WEEK = [
+              "\x02",          /** substitution token to support parsing */
+              "Sunday",        /** DAYS_OF_WEEK[1] = "Sunday" */
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+              ];
+
+const DAYS_OF_WEEK_ABBREVIATED = [
+              "\x03",          /** substitution token to support parsing */
+              "Sun",           /** DAYS_OF_WEEK_ABBREVIATED[1] = "Sunday" */
+              "Mon",
+              "Tue",
+              "Wed",
+              "Thu",
+              "Fri",
+              "Sat"
+              ];
 
 function LCARS() {
     
@@ -163,6 +202,22 @@ LCARS.getFont = function() {
     return this.font;
 }
 
+LCARS.getLCARSFontSize = function(properties) {
+    switch(properties & ES_FONT) {
+        case EF_TITLE:
+            return FONT_TITLE_SIZE;
+        case EF_SUBTITLE:
+            return FONT_SUBTITLE_SIZE;
+        case EF_BUTTON:
+            return FONT_BUTTON_SIZE;
+        case EF_TINY:
+            return FONT_TINY_SIZE
+        case EF_BODY:
+        default:
+            return FONT_BODY_SIZE;
+    }
+}
+
 /**
  * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
  *
@@ -175,6 +230,19 @@ LCARS.getTextWidth  = function(text, font) {
     context.font = font;
     var metrics = context.measureText(text);
     return metrics.width;
+}
+
+LCARS.getTextWidth2  = function(text, font) {
+    var width = 0;
+    
+    for (var i=0; i < text.length; i++) {
+        console.log(text.charAt(i));
+        width += LCARS.getTextWidth(text.charAt(i), font);
+        console.log(width);
+    }
+
+    console.log(width);
+    return width;
 }
 
 
@@ -194,7 +262,7 @@ LCARSComponent = function(id, label, x, y, properties) {
         this.overColor = this.getOverColor();
         this.downColor = this.getDownColor();
         this.textColor = this.getTextColor();
-        this.fontSize = this.getLCARSFontSize();
+        this.fontSize = LCARS.getLCARSFontSize(this.properties);
         
         this.element = document.createElementNS(svgNS, "g");
         this.element.setAttribute("id", this.id);
@@ -306,22 +374,6 @@ LCARSComponent.prototype.setComponentDynamics = function() {
         this.shapeElement.setAttribute("onmouseup", "evt.target.setAttribute('fill','" + this.color + "')");
         this.shapeElement.setAttribute("onmouseout", "evt.target.setAttribute('fill','" + this.color + "')");
         //this.shapeElement.setAttribute("onclick", "alert('click!')");
-    }
-}
-
-LCARSComponent.prototype.getLCARSFontSize = function() {
-    switch(this.properties & ES_FONT) {
-        case EF_TITLE:
-            return FONT_TITLE_SIZE;
-        case EF_SUBTITLE:
-            return FONT_SUBTITLE_SIZE;
-        case EF_BUTTON:
-            return FONT_BUTTON_SIZE;
-        case EF_TINY:
-            return FONT_TINY_SIZE
-        case EF_BODY:
-        default:
-            return FONT_BODY_SIZE;
     }
 }
 
@@ -470,6 +522,11 @@ LCARSComponent.prototype.drawShape = function() {
 }
 
 
+LCARSComponent.prototype.setPosition = function(x, y) {
+    this.element.setAttribute("transform", 'translate(' + x + ',' +  y +')');
+}
+
+
 LCARSComponent.prototype.setShapeAttributes = function() {
     this.shapeElement.setAttribute("id", this.id + SHAPE_SUFFIX);
     this.shapeElement.setAttribute("fill", this.color);
@@ -533,7 +590,8 @@ LCARSComponent.prototype.setText = function(textString) {
 
 
 LCARSComponent.prototype.setTextFontSize = function(textFontSize) {
-    this.textElement.setAttribute("font-size", textFontSize);
+    this.fontSize = textFontSize;
+    this.textElement.setAttribute("font-size", this.fontSize);
 }
 
 
@@ -885,329 +943,7 @@ LCARSText.prototype.getTextY = function() {
 }
 
 
-/**
- * LCARS Calendar component
- */
-LCARSCalendar.prototype = new LCARSComponent();
-function LCARSCalendar(name, label, x, y, properties) {
-    LCARSComponent.call(this, name, "", x, y, properties); /** Calendar doesn't have a label. */
-    this.static = ES_STATIC;  // Text is always static.
-    this.textColor = this.getColor();
-    
-    this.drawText();
-}
 
-LCARSCalendar.prototype.getTextAnchor = function() {
-    if((this.properties & ES_LABEL) == 0) {
-        this.properties |= ES_LABEL_W;
-    }
-    
-    return LCARSComponent.prototype.getTextAnchor.call(this);
-}
-
-LCARSCalendar.prototype.drawShape = function() {
-    return "";
-}
-
-LCARSCalendar.prototype.getTextX = function() {
-    return 0;
-}
-
-LCARSCalendar.prototype.getTextY = function() {
-    return 0;
-}
-
-LCARSCalendar.prototype.drawText = function() {
-    this.textElement = document.createElementNS(svgNS, "text");
-    this.textElement.setAttribute("id", this.id + TEXT_SUFFIX);
-    this.textElement.setAttribute("x", this.getTextX());
-    this.textElement.setAttribute("y", this.getTextY());
-    this.textElement.setAttribute("text-anchor", this.getTextAnchor());
-    this.textElement.setAttribute("fill", this.textColor);
-    this.textElement.setAttribute("font-family", LCARS.getFont());
-    this.textElement.setAttribute("font-size", this.fontSize);
-
-    this.textSpan1 = document.createElementNS(svgNS, "tspan");
-    this.textSpan1.setAttribute("id", this.id + "_textSpan");
-    this.textSpan1.setAttribute("x", "0");
-    this.textSpan1.setAttribute("y", "50");
-    this.textSpan1.textContent = "LINE 1";
-
-    this.textElement.appendChild(this.textSpan1);
-
-    this.setText(this.label);
-
-    this.element.appendChild(this.textElement);
-}
-
-//LCARSCalendar.prototype = new LCARSComponent();
-//function LCARSCalendar(name, x, y, properties) {
-//    LCARSComponent.call(this, name, "", x, y, properties); /** Calendar doesn't have a label. */
-//    this.static = ES_STATIC;  /** Calendar is always static. */
-//    this.textColor = this.getColor();
-//    
-//    //this.setToday();
-//    
-//    //this.displayMonth = this.currentMonth;
-//    //this.displayYear = this.currentYear;
-//    
-//    this.drawText();
-//}
-//
-//
-///**
-// * Set the calendar object's date to today's date.
-// */
-//LCARSCalendar.prototype.setToday() = function() {
-//    /** Get the current date and time. */
-//    this.now = new Date();
-//    
-//    /** Set the object's <code>today</code> attribute to the current date. */
-//    this.today = now.getDate();
-//    
-//    /** Set the object's current month and year from the current date/time. 
-//     Add 1900 to the current year to get a valid four digit year. Note: javascript
-//     counts years from 1900 (a Y2K thing). */
-//    this.currentMonth = now.getMonth();
-//    this.currentYear  = now.getYear();
-//    this.currentYear += 1900;
-//}
-//
-//
-///**
-// * Returns <code>true</code> if the year is a four (4) digit year.
-// *
-// * @param year the year as a number
-// */
-//LCARSCalendar.prototype.isFourDigitYear(year) = function() {
-//    /** First, check to make sure the argument is a number. If not, return <code>false</code>. */
-//    if(isNaN(year)) {
-//        return false;
-//    }
-//    /** If it is a number, check the length. If length is 4, return <code>true</code>,
-//     else <code>false</code>. */
-//    else if(year.length == 4) {
-//        return true;
-//    }
-//    else {
-//        return false;
-//    }
-//}
-//
-//
-///**
-// * Decrement the year for the displayed calendar month.
-// */
-//LCARSCalendar.prototype.decrementYear() = function() {
-//    var year  = this.displayYear - 1;
-//    if (isFourDigitYear(year)) {
-//        this.displayYear = year;
-//        this.drawCalendar();
-//    }
-//}
-//
-//
-///**
-// * Decrement the month for the displayed calendar.
-// */
-//LCARSCalendar.prototype.decrementMonth() = function() {
-//    var month  = this.displayMonth - 1;
-//    if (month < 0) {
-//        month = 11;
-//    }
-//    this.displayMonth = month;
-//    this.drawCalendar();
-//}
-//
-//
-///**
-// * Increment the year for the displayed calendar month.
-// */
-//LCARSCalendar.prototype.incrementYear() = function() {
-//    var year  = this.displayYear + 1;
-//    if (isFourDigitYear(year)) {
-//        this.displayYear = year;
-//        this.drawCalendar();
-//    }
-//}
-//
-//
-///**
-// * Increment the month for the displayed calendar.
-// */
-//LCARSCalendar.prototype.incrementMonth() = function() {
-//    var month  = this.displayMonth + 1;
-//    if (month > 11) {
-//        month = 0;
-//    }
-//    this.displayMonth = month;
-//    this.drawCalendar();
-//}
-//
-//
-///**
-// * Returns true if the argument specified four digit year is a leap year.
-// *
-// * @param year the four digit year
-// * @return  true if the given year is a leap year, false, if not
-// */
-//LCARSCalendar.prototype.isLeapYear(year) = function() {
-//    /**
-//     * If the current year is evenly divisible by 4 and not by 100, return true.
-//     */
-//    if((year % 4 == 0) && (year % 100 != 0)) {
-//        return true;
-//    }
-//    
-//    /**
-//     * If the current year is evenly divisible by 400, return true.
-//     */
-//    if(year % 400 == 0) {
-//        return true;
-//    }
-//    
-//    /**
-//     * If none of the leap year conditions is met, method falls through,
-//     * and returns false.
-//     */
-//    return false;
-//}
-//
-//
-///**
-// * Returns the day of the week according to the Gregorian calendar, given
-// * the <code>month</code>, <code>day</code>, and <code>year</code>.
-// * January through December equal 1 - 12, and Sunday through Saturday equal
-// * 0 - 6.
-// * @param month  the month of the date
-// * @param day  the day of the date
-// * @param year  the year of the date
-// * @return  the day of the week according to the Gregorian calendar
-// */
-//LCARSCalendar.prototype.dayOfWeek(month, day, year) = function() {
-//    var y = year - (14 - month) / 12;
-//    var x = y + y/4 - y/100 + y/400;
-//    var m = month + 12 * ((14 - month) / 12) - 2;
-//    var d = (day + x + (31 * m)/12) % 7;
-//    return d;
-//}
-//
-//
-///**
-// * Returns <code>true</code> if the day of the week integer argument is greater
-// * than Sunday (0) and less than Saturday (6).
-// * <ul>
-// * <li>Sunday = 0</li>
-// * <li>Monday = 1</li>
-// * <li>Tuesday = 2</li>
-// * <li>Wednesday = 3</li>
-// * <li>Thursday = 4</li>
-// * <li>Friday = 5</li>
-// * <li>Saturday = 6</li>
-// * </ul>
-// *
-// * @param day an integer between 1 and 5 inclusive to return <code>true</code>, else <code>false</code>
-// * @return <code>true</code> if weekday (Mon - Fri), <code>false</code> if not
-// */
-//LCARSCalendar.prototype.isWeekday(day) = function() {
-//    var _day = this.dayOfWeek(this.displayMonth, day, this.displayYear);
-//    
-//    if(_day > 0 && _day < 6) {
-//        return true;
-//    }
-//    else {
-//        return false;
-//    }
-//}
-//
-//
-///**
-// * Returns <code>true</code> if the <code>day</code> argument indicates a Sunday, an integer 0.
-// *
-// * @param day an integer value for the day
-// * @return <code>true</code> if Sunday, <code>false</code> if not
-// */
-//LCARSCalendar.prototype.isSunday(day) = function() {
-//    var _day = this.dayOfWeek(this.displayMonth, day, this.displayYear);
-//    
-//    if(_day == 0) {
-//        return true;
-//    }
-//    else {
-//        return false;
-//    }
-//}
-//
-//
-///**
-// * Returns <code>true</code> if the <code>day</code> argument indicates a Saturday, an integer 6.
-// *
-// * @param day an integer value for the day
-// * @return <code>true</code> if Saturday, <code>false</code> if not
-// */
-//LCARSCalendar.prototype.isSaturday(day) = function() {
-//    var _day = this.dayOfWeek(this.displayMonth, day, this.displayYear);
-//    
-//    if(_day == 6) {
-//        return true;
-//    }
-//    else {
-//        return false;
-//    }
-//}
-//
-//
-///**
-// * Returns <code>true</code> if the <code>day</code> argument indicates the current day.
-// *
-// * @param day an integer value for the day
-// * @return <code>true</code> if today, <code>false</code> if not
-// */
-//LCARSCalendar.prototype.isToday(day) = function() {
-//    if(this.displayYear == this.currentYear && this.displayMonth == this.currentMonth && day == this.currentDay) {
-//        return true;
-//    }
-//    else {
-//        return false;
-//    }
-//}
-//
-//
-///**
-// * Returns the number of days in the argument specified month and year.
-// *
-// * @param month  the integer (0 - 11) identifier of the month
-// * @param year  the four digit year
-// */
-//LCARSCalendar.prototype.getDaysInMonth(month, year) = function() {
-//    var days = 31;
-//    
-//    if(month == 3 || month == 5 || month == 8 || month == 10) {
-//        days = 30;
-//    }
-//    else if(month == 1 ) {
-//        if(this.isLeapYear(year)) {
-//            days = 29;
-//        }
-//        else {
-//            days = 28;
-//        }
-//    }
-//    return days;
-//}
-//
-//
-//
-//
-//
-///**
-// * Draws the current month calendar.
-// */
-//LCARSCalendar.prototype.drawCalendar() = function() {
-//    
-//    this.drawText();
-//    
-//}
 
 /**
  * LCARS TextArea component
@@ -1222,8 +958,11 @@ function LCARSTextArea(name, label, x, y, width, rows, properties) {
     this.width = width;
     this.rows = rows;
     
+    this.lineSpacing = 1.0;
+    
     this.nowrap = true;  // Default to not wrapping lines of text
-    this.canvasFont = Math.round(this.fontSize*0.75) + "pt " + LCARS.getFont();
+    //this.canvasFont = Math.round(this.fontSize*0.75) + "pt " + LCARS.getFont();
+    this.canvasFont = Math.round(this.fontSize*0.54) + "pt " + LCARS.getFont();
     
     this.drawText();
 }
@@ -1237,29 +976,29 @@ LCARSTextArea.prototype.getTextAnchor = function() {
 }
 
 LCARSTextArea.prototype.drawText = function() {
-    this.textAreaElement = document.createElementNS(svgNS, "text");
-    this.textAreaElement.setAttribute("id", this.id + TEXT_SUFFIX);
+    this.textElement = document.createElementNS(svgNS, "text");
+    this.textElement.setAttribute("id", this.id + TEXT_SUFFIX);
+    this.textElement.setAttribute("font-family", LCARS.getFont());
+    this.textElement.setAttribute("font-size", this.fontSize);
+    this.textElement.setAttribute("fill", this.textColor);
 
     this.lineElements = [];
     for(index = 0; index < this.rows; index++) {
         this.lineElements.push(document.createElementNS(svgNS, "tspan"));
         this.lineElements[index].setAttribute("id", this.id + "_" + index + TEXT_SUFFIX);
-        this.lineElements[index].setAttribute("fill", this.textColor);
-        this.lineElements[index].setAttribute("font-family", LCARS.getFont());
-        this.lineElements[index].setAttribute("font-size", this.fontSize);
         this.lineElements[index].setAttribute("x", 0);
-        this.lineElements[index].setAttribute("dy", this.fontSize);
+        this.lineElements[index].setAttribute("dy", this.fontSize * this.lineSpacing);
         
         /** Set <code>tspan</code> attribute to preserve the space for blank lines, and initialize
          the line as blank. */
         this.lineElements[index].setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:space","preserve");
         this.lineElements[index].textContent = "";
 
-        /** Add the <code>tspan</code> SVG element to the parent SVG <code>textAreaElement</code>. */
-        this.textAreaElement.appendChild(this.lineElements[index]);
+        /** Add the <code>tspan</code> SVG element to the parent SVG <code>textElement</code>. */
+        this.textElement.appendChild(this.lineElements[index]);
     }
     
-    this.element.appendChild(this.textAreaElement);
+    this.element.appendChild(this.textElement);
     
     return "";
 }
@@ -1357,6 +1096,21 @@ LCARSTextArea.prototype.initTextArea = function() {
 }
 
 
+LCARSTextArea.prototype.setLineSpacing = function(spacing) {
+    this.lineSpacing = spacing;
+    for(index = 0; index < this.rows; index++) {
+        this.lineElements[index].setAttribute("dy", this.fontSize * this.lineSpacing);
+    }
+}
+
+
+LCARSTextArea.prototype.setTextFontSize = function(textFontSize) {
+    this.fontSize = textFontSize;
+    this.textElement.setAttribute("font-size", this.fontSize);
+    this.setLineSpacing(this.lineSpacing);
+}
+
+
 LCARSTextArea.prototype.setText = function(index, lineOfText) {
     this.lineElements[index].textContent = lineOfText;
 }
@@ -1383,20 +1137,10 @@ LCARSTextArea.prototype.scrollUp = function() {
 }
 
 
-LCARSTextArea.prototype._appendLine = function(lineOfText) {
-    var total = ((this.textAreaElement.value ? this.textAreaElement.value + "\n" : "") + lineOfText).split("\n");
-    
-    if(total.length > this.rows) {
-        total = total.slice(total.length - this.rows);
-    }
-    
-    this.textAreaElement.value = total.join("\n");
-}
-
-
 LCARSTextArea.prototype.getTextX = function() {
     return 0;
 }
+
 
 LCARSTextArea.prototype.getTextY = function() {
     return 0;
@@ -1409,12 +1153,9 @@ LCARSTextArea.prototype.getTextY = function() {
 LCARSKeypad.prototype = new LCARSComponent();
 function LCARSKeypad(name, x, y, properties, auxLabelProperties) {
     LCARSComponent.call(this, name, "", x, y, properties); /** Keypads don't have labels */
-    //this.composite = true;
     
     this.auxLabelProperties = auxLabelProperties;
-
     
-//    this.drawText();
     this.drawShape();
 }
 
@@ -1565,5 +1306,662 @@ LCARSKeypad.prototype.setButtonAuxText = function(button, text) {
 }
 
 
+/**
+ * LCARS Clock component
+ */
+LCARSClock.prototype = new LCARSComponent();
+function LCARSClock(name, label, x, y, properties, updateInterval, format) {
+    LCARSComponent.call(this, name, label, x, y, properties);
+    this.static = ES_STATIC;  // Text is always static.
+    this.textColor = this.getColor();
+    
+    this.updateInterval = updateInterval;
+    this.format = format;
+    
+    this.intervalVariable = null;
+    
+    this.drawText();
+    
+    this.update();
+    
+    this.start();
+}
 
+/**
+ * Function to start the clock. It retrieves a reference to the clock object,
+ * and passes it to an interval timer. The update interval is a class 
+ * variable, and is passed to the constructor of the object.
+ */
+LCARSClock.prototype.start = function() {
+    
+    thisObj = this; // Can't just pass "this" to the setInterval function.
+    
+    thisObj.intervalVariable = setInterval(function() {thisObj.update()}, thisObj.updateInterval);
+}
+
+/**
+ * Function to stop the clock. It test the interval variable, and if it is not
+ * null, it clears it.
+ */
+LCARSClock.prototype.stop = function() {
+    if(!(intervalVariable == null)) {
+        clearInterval(intervalVariable);
+    }
+}
+
+
+/**
+ * Function to update the clock with the current time. It gets passed to an
+ * interval timer and will update the time and date at the rate set by the
+ * interval variable.
+ */
+LCARSClock.prototype.update = function() {
+    
+    /** Update to the current date and time. */
+    now = new Date();
+
+    /** Initialize the format for the updated time date string. */
+    clockString = this.format;
+    
+    /** Format the updated current time date, and set the text field. */
+    this.setText(this.formatString(clockString, now));
+    
+}
+
+
+/**
+ * Function to add a leading zero in front of numbers to the limit of the
+ * length argument to support hours, minutes, seconds, and milliseconds.
+ *
+ * @param number the number to pad with a leading zero
+ * @param length the length of the number to pad leading zeros to
+ */
+LCARSClock.prototype.padLeadingZero = function(number, length) {
+    
+    number = number + "";
+    length = length || 2;
+    
+    while (number.length < length) {
+        number = "0" + number;
+    }
+    
+    return number;
+}
+
+
+/**
+ * Function to format the time and date output associated with the Date 
+ * object <code>now</code> argument based on the <code>formatString</code> argument.
+ * <p>
+ * Note that the order of the parse is important to support the regular expressions that 
+ * are used. See the notes embedded in the code.
+ * <p>
+ * The date format parameters are as follows:
+ * <ul>
+ * <li> yyyy - the four digit year
+ * <li> yy   - the two digit year
+ * <li> y    - the four digit year
+ * <li> MMMM - the full name of the month
+ * <li> MMM  - the abbreviated name of the month
+ * <li> MM   - the month number with a leading zero
+ * <li> M    - the month number without a leading zero
+ * <li> dddd - the full name of the day
+ * <li> ddd  - the abbreviated name of the day
+ * <li> dd   - the day number with a leading zero
+ * <li> d    - the day number without a leading zero
+ * <li> HH   - the 24 hour number with a leading zero
+ * <li> H    - the 24 hour number without a leading zero
+ * <li> hh   - the 12 hour number with a leading zero
+ * <li> h    - the 12 hour number without a leading zero
+ * <li> mm   - the minutes number with a leading zero
+ * <li> m    - the minutes number without a leading zero
+ * <li> ss   - the seconds number with a leading zero
+ * <li> s    - the seconds number without a leading zero
+ * <li> fff  - the milliseconds number with two leading zeroes
+ * <li> ff   - the milliseconds number with one leading zero
+ * <li> f    - the milliseconds number without leading zeroes
+ * <li> TT   - AM - PM upper case
+ * <li> T    - AM - PM upper case single character (A, P)
+ * <li> tt   - AM - PM lower case
+ * <li> t    - AM - PM lower case single character (a, p)
+ * <li> K    - the time zone offset from UTC in the form +/-00:00
+ * <li> Z    - the three character abbreviated time zone
+ *</ul>
+ *
+ * @param formatString the string to parse for the format parameters
+ * @param now the Date object to format
+ * @return the formatted date string
+ */
+LCARSClock.prototype.formatString = function(formatString, now) {
+    
+    /** Get all the time and date paramenters for the <code>now</code> argument. */
+    year = now.getFullYear();
+    month = now.getMonth() + 1; /** add 1, because January is zero. */
+    day = now.getDate();
+    dayOfWeek = now.getDay() + 1; /** add 1, because Sunday is zero. */
+    hour24 = now.getHours();
+    hour12 = hour24 > 12 ? hour24-12 : hour24==0 ? 12 : hour24;
+    meridiem = hour24 > 12 ? "PM" : "AM";
+    minute = now.getMinutes();
+    second = now.getSeconds();
+    millisecond = now.getMilliseconds();
+    timeZoneOffset = now.getTimezoneOffset();
+    timeZoneOffset = Math.abs(timeZoneOffset);
+    var tzHrs = Math.floor(timeZoneOffset / 60);
+    var tzMin = timeZoneOffset % 60;
+    var timeZoneOffsetString = timeZoneOffset > 0 ? "-" : "+";
+    timeZoneOffsetString += this.padLeadingZero(tzHrs) + ":" + this.padLeadingZero(tzMin);
+    timeZoneString = String(String(now).split("(")[1]).split(")")[0];
+    
+
+    /** Parse the year paramenter, and replace it with the built year string. */
+    formatString = formatString.replace(/(^|[^\\])yyyy+/g, "$1" + year);
+    formatString = formatString.replace(/(^|[^\\])yy/g, "$1" + year.toString().substr(2,2));
+    formatString = formatString.replace(/(^|[^\\])y/g, "$1" + year);
+    
+    /** Parse the month parameter, and replace it with the built month string. Note that
+     month names are replaced by tokens to allow the rest of the parse to complete. They
+     are replaced by the month strings when the rest of the parse is finished. */
+    formatString = formatString.replace(/(^|[^\\])MMMM+/g, "$1" + MONTHS[0]);
+    formatString = formatString.replace(/(^|[^\\])MMM/g, "$1" + MONTHS_ABBREVIATED[0]);
+    formatString = formatString.replace(/(^|[^\\])MM/g, "$1" + this.padLeadingZero(month));
+    formatString = formatString.replace(/(^|[^\\])M/g, "$1" + month);
+    
+    /** Parse the day parameter, and replace it with the built day string. Note that
+     day names are replaced by tokens to allow the rest of the parse to complete. They
+     are replaced by the day strings when the rest of the parse is finished. */
+    formatString = formatString.replace(/(^|[^\\])dddd+/g, "$1" + DAYS_OF_WEEK[0]);
+    formatString = formatString.replace(/(^|[^\\])ddd/g, "$1" + DAYS_OF_WEEK_ABBREVIATED[0]);
+    formatString = formatString.replace(/(^|[^\\])dd/g, "$1" + this.padLeadingZero(day));
+    formatString = formatString.replace(/(^|[^\\])d/g, "$1" + day);
+    
+    /** Parse the hour paramenter, and replace it with the built hour string. */
+    formatString = formatString.replace(/(^|[^\\])HH+/g, "$1" + this.padLeadingZero(hour24));
+    formatString = formatString.replace(/(^|[^\\])H/g, "$1" + hour24);
+    formatString = formatString.replace(/(^|[^\\])hh+/g, "$1" + this.padLeadingZero(hour12));
+    formatString = formatString.replace(/(^|[^\\])h/g, "$1" + hour12);
+
+    /** Parse the minutes paramenter, and replace it with the built minutes string. */
+    formatString = formatString.replace(/(^|[^\\])mm+/g, "$1" + this.padLeadingZero(minute));
+    formatString = formatString.replace(/(^|[^\\])m/g, "$1" + minute);
+    
+    /** Parse the seconds paramenter, and replace it with the built seconds string. */
+    formatString = formatString.replace(/(^|[^\\])ss+/g, "$1" + this.padLeadingZero(second));
+    formatString = formatString.replace(/(^|[^\\])s/g, "$1" + second);
+    
+    /** Parse the year milliseconds, and replace it with the built milliseconds string. */
+    formatString = formatString.replace(/(^|[^\\])fff+/g, "$1" + this.padLeadingZero(millisecond, 3));
+    millisecond = Math.round(millisecond / 10);
+    formatString = formatString.replace(/(^|[^\\])ff/g, "$1" + this.padLeadingZero(millisecond));
+    millisecond = Math.round(millisecond / 10);
+    formatString = formatString.replace(/(^|[^\\])f/g, "$1" + millisecond);
+    
+    /** Parse the meridiem paramenter, and replace it with the built meridiem string. */
+    formatString = formatString.replace(/(^|[^\\])TT+/g, "$1" + meridiem);
+    formatString = formatString.replace(/(^|[^\\])T/g, "$1" + meridiem.charAt(0));
+    formatString = formatString.replace(/(^|[^\\])tt+/g, "$1" + meridiem.toLowerCase());
+    formatString = formatString.replace(/(^|[^\\])t/g, "$1" + meridiem.toLowerCase().charAt(0));
+    
+    /** Parse the timezone offset paramenter, and replace it with the built timezone offset string. */
+    formatString = formatString.replace(/(^|[^\\])K/g, "$1" + timeZoneOffsetString);
+    
+    /** Parse the timezone paramenter, and replace it with the timezone abbreviated name. */
+    formatString = formatString.replace(/(^|[^\\])Z/g, "$1" + timeZoneString);
+    
+    /** Parse the month paramenter token, and replace it with the built month string. */
+    formatString = formatString.replace(new RegExp(MONTHS[0], "g"), MONTHS[month]);
+    formatString = formatString.replace(new RegExp(MONTHS_ABBREVIATED[0], "g"), MONTHS_ABBREVIATED[month]);
+    
+    /** Parse the day paramenter token, and replace it with the built day string. */
+    formatString = formatString.replace(new RegExp(DAYS_OF_WEEK[0], "g"), DAYS_OF_WEEK[dayOfWeek]);
+    formatString = formatString.replace(new RegExp(DAYS_OF_WEEK_ABBREVIATED[0], "g"), DAYS_OF_WEEK_ABBREVIATED[dayOfWeek]);
+    
+    /** return the formatted string. */
+    return formatString;
+}
+
+LCARSClock.prototype.getTextAnchor = function() {
+    if((this.properties & ES_LABEL) == 0) {
+        this.properties |= ES_LABEL_W;
+    }
+    
+    return LCARSComponent.prototype.getTextAnchor.call(this);
+}
+
+LCARSClock.prototype.drawShape = function() {
+    
+    
+    return "";
+}
+
+
+
+const MAX_DAYS_IN_MONTH_DISPLAY = 42; /** 6 lines of 7 days */
+/**
+ * LCARS Calendar component
+ */
+LCARSCalendar.prototype = new LCARSComponent();
+function LCARSCalendar(name, x, y, font_size, daySpacing, properties) {
+    LCARSComponent.call(this, name, "", x, y, properties | ES_LABEL_E); /** Calendar doesn't have a label. */
+    this.static = ES_STATIC;  /** Calendar is always static. */
+    this.textColor = this.getColor();
+    
+    this.font_size = font_size;
+    
+    this.daySpacing = daySpacing;
+
+    this.setToday();
+
+    this.intervalVariable = null;
+
+    this.displayMonth = this.currentMonth;
+    this.displayYear = this.currentYear;
+    
+    /** Create an array to hold 6 lines of 7 days. */
+    this.displayDays = new Array(MAX_DAYS_IN_MONTH_DISPLAY);
+
+    this.drawShape();
+    
+    this.updateCalendar();
+    
+}
+
+LCARSCalendar.prototype.drawShape = function() {
+    
+    var header_offset = this.font_size * 2;
+    
+    this.monthText = new LCARSText("", this.displayMonthString, 0, 0, ES_LABEL_C | EC_L_BLUE);
+    this.monthText.setTextFontSize(this.font_size);
+    this.element.appendChild(this.monthText.element);
+    
+    this.yearText = new LCARSText("", this.displayYearString, 6 * this.font_size * this.daySpacing, 0, ES_LABEL_E | EC_L_BLUE);
+    this.yearText.setTextFontSize(this.font_size);
+    this.element.appendChild(this.yearText.element);
+    
+    
+    for(i=0; i<MAX_DAYS_IN_MONTH_DISPLAY; i++) {
+        
+        y_offset = parseInt(i/7) * this.font_size * 2;
+        x_offset = i%7 * this.font_size * this.daySpacing;
+        
+        this.displayDays[i] = new LCARSText("day_" + i.toString(), i.toString(), x_offset, i+y_offset+header_offset, this.properties);
+        this.displayDays[i].setTextFontSize(this.font_size);
+        
+        if(parseInt(i/7) == 1) {
+            this.displayDays[i].textElement.setAttribute("x", 0);
+        }
+        
+        this.element.appendChild(this.displayDays[i].element);
+    }
+    
+    return "";
+}
+
+
+LCARSCalendar.prototype.updateCalendar = function() {
+    
+    this.displayMonthString = MONTHS[this.displayMonth+1];
+    this.displayYearString = this.displayYear.toString();
+    
+    this.monthText.setText(this.displayMonthString);
+    this.yearText.setText(this.displayYearString);
+    
+    /**
+     * Get the starting day of week for the month.
+     */
+    startDay = this.dayOfWeek(this.displayMonth, 1, this.displayYear);
+    
+    /**
+     * Get the number of the days in the display month.
+     */
+    daysInMonth = this.getDaysInMonth(this.displayMonth, this.displayYear);
+    
+    
+    /**
+     * Clear the calendar of text, and fill it with the appropriate days
+     * for the display month and the display year.
+     */
+    for(i=0; i<MAX_DAYS_IN_MONTH_DISPLAY; i++) {
+        if(i < startDay || i > startDay+daysInMonth-1) {
+            this.displayDays[i].setText("");
+        }
+        else {
+            day = i-startDay+1;
+            this.displayDays[i].setText(day);
+            
+            var _day = this.dayOfWeek(this.displayMonth, day, this.displayYear);
+            
+            if(this.isWeekday(day)) {
+                this.displayDays[i].textElement.setAttribute("fill", LCARS.getColor(EC_L_BLUE));
+            }
+            if(this.isSunday(parseInt(day))) {
+                this.displayDays[i].textElement.setAttribute("fill", LCARS.getColor(EC_ORANGE));
+            }
+            if(this.isSaturday(day)) {
+                this.displayDays[i].textElement.setAttribute("fill", LCARS.getColor(EC_M_BLUE));
+            }
+            
+            if(this.isToday(day)) {
+                this.displayDays[i].textElement.setAttribute("fill", LCARS.getColor(EC_YELLOW));
+            }
+        }
+    }
+}
+
+
+LCARSCalendar.prototype.update = function() {
+    var rightNow = new Date();
+    
+    if(!(rightNow.getYear() == this.now.getYear()) || !(rightNow.getMonth() == this.now.getMonth())) {
+        alert("cy: " + this.currentYear + "  cm: " + this.currentMonth + "  rn: " + rightNow.getYear() + ", " + rightNow.getMonth());
+        this.setToday();
+        this.displayMonth = this.currentMonth;
+        this.displayYear = this.currentYear;
+        this.updateCalendar();
+    }
+    
+    // ****** TEST CODE
+    this.stopAutoUpdate();
+}
+
+
+/**
+ * Function to start the auto update of the calendar. It retrieves a reference 
+ * to the clock object, and passes it to an interval timer. The update interval 
+ * is a class variable, and is passed to the constructor of the object.
+ */
+LCARSCalendar.prototype.startAutoUpdate = function() {
+    
+    thisObj = this; // Can't just pass "this" to the setInterval function.
+    
+    thisObj.intervalVariable = setInterval(function() {thisObj.update()}, 1000); // Update is fixed to one second.
+}
+
+/**
+ * Function to stop the auto update of the calendar. It test the interval variable, 
+ * and if it is not null, it clears it.
+ */
+LCARSCalendar.prototype.stopAutoUpdate = function() {
+    if(!(this.intervalVariable == null)) {
+        clearInterval(this.intervalVariable);
+    }
+}
+
+
+LCARSCalendar.prototype.clearCalendarText = function() {
+    for(i=0; i<MAX_DAYS_IN_MONTH_DISPLAY; i++) {
+        this.displayDays[i].setText("");
+    }
+}
+
+
+/** Function to set the spacing between the day elements of the calendar.
+ *
+ * @param spaceMultiplier multiplies the font size to produce a space between the day elements
+ */
+LCARSCalendar.prototype.setDaySpacing = function(spaceMultiplier) {
+    this.daySpacing = spaceMultiplier;
+}
+
+
+
+/**
+ * Set the calendar object's date to today's date.
+ */
+LCARSCalendar.prototype.setToday = function() {
+    /** Get the current date and time. */
+    this.now = new Date();
+
+    /** Set the object's <code>today</code> attribute to the current date. */
+    this.today = now.getDate();
+
+    /** Set the object's current month and year from the current date/time.
+     Add 1900 to the current year to get a valid four digit year. Note: javascript
+     counts years from 1900 (a Y2K thing). */
+    this.currentMonth = now.getMonth();
+    this.currentYear  = now.getYear();
+    this.currentYear += 1900;
+}
+
+
+/**
+ * Returns <code>true</code> if the year is a four (4) digit year.
+ *
+ * @param year the year as a number
+ */
+LCARSCalendar.prototype.isFourDigitYear = function(year) {
+    
+    /** First, check to make sure the argument is a number. If not, return <code>false</code>. */
+    if(isNaN(year)) {
+        return false;
+    }
+    /** If it is a number, check the length. If length is 4, return <code>true</code>,
+     else <code>false</code>. */
+    else if(year.toString().length == 4) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
+ * Decrement the year for the displayed calendar month.
+ */
+LCARSCalendar.prototype.decrementYear = function() {
+    var year  = this.displayYear - 1;
+    if (this.isFourDigitYear(year)) {
+        this.displayYear = year;
+        this.updateCalendar();
+    }
+}
+
+
+/**
+ * Decrement the month for the displayed calendar.
+ */
+LCARSCalendar.prototype.decrementMonth = function() {
+    var month  = this.displayMonth - 1;
+    if (month < 0) {
+        month = 11;
+    }
+    this.displayMonth = month;
+    this.updateCalendar();
+}
+
+
+/**
+ * Increment the year for the displayed calendar month.
+ */
+LCARSCalendar.prototype.incrementYear = function() {
+    var year  = this.displayYear + 1;
+    if (this.isFourDigitYear(year)) {
+        this.displayYear = year;
+        this.updateCalendar();
+    }
+    else {
+        alert("displayYear + 1: " + this.displayYear + "  is not a 4 digit year.");
+    }
+}
+
+
+/**
+ * Increment the month for the displayed calendar.
+ */
+LCARSCalendar.prototype.incrementMonth = function() {
+    var month  = this.displayMonth + 1;
+    if (month > 11) {
+        month = 0;
+    }
+    this.displayMonth = month;
+    this.updateCalendar();
+}
+
+
+/**
+ * Returns true if the argument specified four digit year is a leap year.
+ *
+ * @param year the four digit year
+ * @return  true if the given year is a leap year, false, if not
+ */
+LCARSCalendar.prototype.isLeapYear = function(year) {
+    /**
+     * If the current year is evenly divisible by 4 and not by 100, return true.
+     */
+    if((year % 4 == 0) && (year % 100 != 0)) {
+        return true;
+    }
+
+    /**
+     * If the current year is evenly divisible by 400, return true.
+     */
+    if(year % 400 == 0) {
+        return true;
+    }
+
+    /**
+     * If none of the leap year conditions is met, method falls through,
+     * and returns false.
+     */
+    return false;
+}
+
+
+/**
+ * Returns the day of the week according to the Gregorian calendar, given
+ * the <code>month</code>, <code>day</code>, and <code>year</code>.
+ * January through December equal 0 - 11, and Sunday through Saturday equal
+ * 0 - 6.
+ * @param month  the month of the date
+ * @param day  the day of the date
+ * @param year  the year of the date
+ * @return  the day of the week according to the Gregorian calendar
+ */
+LCARSCalendar.prototype.dayOfWeek = function(month, day, year) {
+    
+    var date = new Date(year, month, day);
+    
+    return date.getDay();
+}
+
+
+/**
+ * Returns <code>true</code> if the day of the week integer argument is greater
+ * than Sunday (0) and less than Saturday (6).
+ * <ul>
+ * <li>Sunday = 0</li>
+ * <li>Monday = 1</li>
+ * <li>Tuesday = 2</li>
+ * <li>Wednesday = 3</li>
+ * <li>Thursday = 4</li>
+ * <li>Friday = 5</li>
+ * <li>Saturday = 6</li>
+ * </ul>
+ *
+ * @param day an integer between 1 and 5 inclusive to return <code>true</code>, else <code>false</code>
+ * @return <code>true</code> if weekday (Mon - Fri), <code>false</code> if not
+ */
+LCARSCalendar.prototype.isWeekday = function(day) {
+    var _day = this.dayOfWeek(this.displayMonth, day, this.displayYear);
+
+    if(_day > 0 && _day < 6) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
+ * Returns <code>true</code> if the <code>day</code> argument indicates a Sunday, an integer 0.
+ *
+ * @param day an integer value for the day
+ * @return <code>true</code> if Sunday, <code>false</code> if not
+ */
+LCARSCalendar.prototype.isSunday = function(day) {
+    
+    var date = new Date(this.displayYear, this.displayMonth, day);
+    
+    var _day = date.getDay();
+    
+    if(_day == 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
+ * Returns <code>true</code> if the <code>day</code> argument indicates a Saturday, an integer 6.
+ *
+ * @param day an integer value for the day
+ * @return <code>true</code> if Saturday, <code>false</code> if not
+ */
+LCARSCalendar.prototype.isSaturday = function(day) {
+    var _day = this.dayOfWeek(this.displayMonth, day, this.displayYear);
+
+    if(_day == 6) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
+ * Returns <code>true</code> if the <code>day</code> argument indicates the current day.
+ *
+ * @param day an integer value for the day
+ * @return <code>true</code> if today, <code>false</code> if not
+ */
+LCARSCalendar.prototype.isToday = function(day) {
+    if(this.displayYear == this.currentYear && this.displayMonth == this.currentMonth && day == this.today) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
+ * Returns the number of days in the argument specified month and year.
+ *
+ * @param month  the integer (0 - 11) identifier of the month
+ * @param year  the four digit year
+ */
+LCARSCalendar.prototype.getDaysInMonth = function(month, year) {
+    var days = 31;
+
+    if(month == 3 || month == 5 || month == 8 || month == 10) {
+        days = 30;
+    }
+    else if(month == 1 ) {
+        if(this.isLeapYear(year)) {
+            days = 29;
+        }
+        else {
+            days = 28;
+        }
+    }
+    return days;
+}
+
+
+
+
+
+///**
+// * Draws the current month calendar.
+// */
+//LCARSCalendar.prototype.drawCalendar() = function() {
+//
+//    this.drawText();
+//    
+//}
 

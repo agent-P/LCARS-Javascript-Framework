@@ -1,0 +1,80 @@
+<html>
+    
+    <head>
+        <title>LCARS Basic Screen Test</title>
+        <link rel="apple-touch-icon" href="./img/apple-touch-icon.png"/>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+        <meta name = "viewport" content = "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        
+        <script src="./js/LCARS_Components.js"></script>
+        <script src="./js/LCARS_Screens.js"></script>
+        <style>
+            @font-face {
+                font-family: "LCARS";
+                src: url(./Antonio-Light.ttf) format("truetype");
+            }
+        </style>
+        
+        <script language="javascript" type="text/javascript">
+            
+            
+            
+            var host = window.location.hostname;
+            
+            var portraitDivElement;
+            var landscapeDivElement;
+            
+            var portraitScreen;
+            var landscapeScreen;
+            
+            /**
+             * The application initialization function ************************************************
+             */
+        var  init = function() {
+            console.log("screen height: " + screen.height);
+            console.log("screen width: " + screen.width);
+            LCARS.setFont("LCARS");
+            
+            landscapeScreen = new LCARSBasicScreen('_landscape', 'LCARS BASIC SCREEN', 1840, 1080);
+            landscapeScreen.setViewBox(0, 0, 1840, 1080);
+            
+            document.body.appendChild(landscapeScreen.element);
+            
+            
+            
+            /**
+             * Landscape Screen
+             */
+            
+            
+            l_text_message = new LCARSText("l_text_message", "TEST: LCARS BASIC SCREEN", 250, 200 , EF_TITLE | EC_ORANGE);
+            l_text_message.setTextFontSize(90);
+            landscapeScreen.addComponent(l_text_message);
+            
+            l_text_message_sub_1 = new LCARSText("l_text_message_sub_1", "EXAMPLE: WHITE TEXT", 375, 300 , EF_SUBTITLE | EC_WHITE);
+            landscapeScreen.addComponent(l_text_message_sub_1);
+            
+            l_text_message_sub_2 = new LCARSText("l_text_message_sub_2", "EXAMPLE: YELLOW TEXT", 375, 350 , EF_SUBTITLE | EC_YELLOW);
+            landscapeScreen.addComponent(l_text_message_sub_2);
+            
+            l_text_message_sub_3 = new LCARSText("tl_ext_message_sub_3", "EXAMPLE: RED TEXT" + host, 375, 400 , EF_SUBTITLE | EC_RED);
+            landscapeScreen.addComponent(l_text_message_sub_3);
+            
+            
+            
+        }
+        
+        
+        
+            </script>
+        
+    </head>
+    
+    <body  bgcolor="#000000" onload="init();" >
+        
+    </body>
+    
+</html>
+

@@ -7,6 +7,13 @@
         <script src="./js/LCARS_Components.js"></script>
         <script src="./js/LCARS_Screens.js"></script>
             
+            <style>
+                @font-face {
+                    font-family: "LCARS";
+                    src: url(./Antonio-Light.ttf) format("truetype");
+                }
+            </style>
+            
         <script language="javascript" type="text/javascript">
         
         var testScreen;
@@ -25,9 +32,15 @@
         
         var  init = function() {
             
+            LCARS.setFont("LCARS");
+            
             //testScreen = new LCARSScreen('test', '', '100%', '100%', 0, 0, 1920, 1500);
-            testScreen = new LCARSScreen('test', 'LCARS COMPONENT TEST SCREEN', '1920', '1600', 0, 0, 1920, 1500);
-            document.body.appendChild(testScreen.divElement);
+            //testScreen = new LCARSScreen('test', 'LCARS COMPONENT TEST SCREEN', '1920', '1600');
+            testScreen = new LCARSBlankScreen('test', 'LCARS COMPONENT TEST SCREEN', 1920, 1550);
+            //testScreen.setTransform('scale(0.45) translateX(-440px) translateY(-575px)');
+            testScreen.setViewBox(0, 0, 1920, 1550);
+            //testScreen.setTransform('scale(0.85)');
+            document.body.appendChild(testScreen.element);
             
             ulc = new LCARSCorner("ULC", "Upper Left", 5, 100, 1000, 1, ES_SHAPE_NW | EC_ORANGE | ES_STATIC);
             testScreen.addComponent(ulc);
@@ -54,6 +67,8 @@
             testScreen.addComponent(ulc7);
             ulc8 = new LCARSCorner("ULC8", "Text", 1120, 579, 500, 1, ES_SHAPE_NW | EC_RED);
             testScreen.addComponent(ulc8);
+            text_corner = new LCARSText("text_corner", "LCARS Button Text Corner", 1625, 579 + FONT_BUTTON_SIZE-3, EF_BUTTON | EC_ORANGE);
+            testScreen.addComponent(text_corner);
             
             rect_1 = new LCARSRectangle("RECT1", "", 10, 675, 1000, 30, EC_ORANGE);
             testScreen.addComponent(rect_1);
@@ -134,6 +149,7 @@
             testScreen.addComponent(textArea);
             
             textArea.setNoWrap(false);
+            textArea.setLineSpacing(1.2);
             textArea.appendLine("Ne malis tractatos vel. Mucius labores id mei. Per at purto sententiae appellantur. Id cibo vivendo epicuri nec. Nibh munere no mei, populo accusam vix ut, at mei epicuri dignissim. Prima laudem pri te.");
             textArea.appendLine(" ");
             textArea.appendLine("Eu mel regione luptatum adolescens, vim error graece ne, eu sea possim consectetuer. Id has copiosae praesent forensibus, bonorum qualisque sententiae nec in. Gubergren efficiantur te usu. Veniam aliquando repudiandae in nam, eu vel vituperata appellantur, eu civibus referrentur sit. Eius labores has an, per ea saperet nusquam indoctum. Est fugit forensibus ei. Appareat partiendo ut pro, at vocibus postulant pri, ea meis alienum accusamus cum.");
@@ -146,9 +162,17 @@
             testScreen.addComponent(scrollingTextArea);
             
             scrollingTextArea.setNoWrap(false);
+            scrollingTextArea.setTextFontSize(30);
+            scrollingTextArea.setLineSpacing(1.25);
             
             scrollTestInterval = setInterval(function() { textAreaScrollTest() }, 1000);
             
+            clock_1 = new LCARSClock("clock_1", "LCARS clock_1 Text", 400, 175 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 500, "dddd h:mm:ss TT d MMM yyyy");
+            testScreen.addComponent(clock_1);
+            
+            clock_1.setTextFontSize(100);
+            
+
  
             //calendar = new LCARSCalendar("calendar test", "LCARS Body Text", 1490, 850 + FONT_BODY_SIZE, EF_BODY | EC_ORANGE);
             //testScreen.addComponent(calendar);

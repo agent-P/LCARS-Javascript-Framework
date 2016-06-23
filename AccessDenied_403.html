@@ -1,18 +1,26 @@
 <html>
     
     <head>
-        <title>LCARS Security System</title>
+        <title>Access Denied</title>
         <link rel="apple-touch-icon" href="./img/apple-touch-icon.png"/>
         <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
         <meta name = "viewport" content = "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-            
-
+        
         <script src="./js/LCARS_Components.js"></script>
-        <script src="./js/LCARS_Screens_iPhone.js"></script>
+        <script src="./js/LCARS_Screens.js"></script>
+        <style>
+            @font-face {
+                font-family: "LCARS";
+                src: url(./Antonio-Light.ttf) format("truetype");
+            }
+        </style>
+
         <script language="javascript" type="text/javascript">
        
+       
+        
        var host = window.location.hostname;
        
        var portraitDivElement;
@@ -25,43 +33,54 @@
          * The application initialization function ************************************************
          */
         var  init = function() {
-            if(navigator.userAgent.indexOf("iPhone") != -1 || navigator.userAgent.indexOf("iPad") != -1) {
-                LCARS.setFont(LCARS_FONT_MOBILE);
+            /**
+             * Create the Screen containers.
+             */
+            portraitDivElement = document.createElement("div");
+            
+            portraitDivElement.style.position = "absolute";
+            portraitDivElement.style.width = "705px";
+            portraitDivElement.style.height = "1000px";
+            portraitDivElement.style.top = "5px";
+            portraitDivElement.style.left = "5px";
+            portraitDivElement.style.webkitTransform =  'scale(0.45) translateX(-440px) translateY(-575px)';
+            
+            document.body.appendChild(portraitDivElement);
+
+            landscapeDivElement = document.createElement("div");
+            
+            landscapeDivElement.style.position = "absolute";
+            landscapeDivElement.style.width = "1700px";
+            landscapeDivElement.style.height = "1000px";
+            landscapeDivElement.style.top = "5px";
+            landscapeDivElement.style.left = "5px";
+            landscapeDivElement.style.webkitTransform = 'scale(0.33) translateX(-1730px) translateY(-1020px)';
+            
+            document.body.appendChild(landscapeDivElement);
+            
+            LCARS.setFont("LCARS");
+            
+            portraitScreen = new LCARSBasicScreen('_portrait', '403-FORBIDDEN', 705, 1015);
+
+            if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+                portraitDivElement.appendChild(portraitScreen.element);
+                landscapeScreen = new LCARSBasicScreen('_landscape', '403 - FORBIDDEN', 1700, 950);
+                landscapeDivElement.appendChild(landscapeScreen.element);
+                updateOrientation();
             }
             else {
-                LCARS.setFont(LCARS_FONT);
+                landscapeScreen = new LCARSBasicScreen('_landscape', '403-FORBIDDEN', 1840, 1080);
+                landscapeScreen.setViewBox(0, 0, 1840, 1080);
+                document.body.appendChild(landscapeScreen.element);
             }
-            
-            portraitScreen = new LCARSScreen('_portrait', '', 705, 1015, 0, 0, 640, 1136);
-            portraitScreen.divElement.style.border = "1px solid blue";
-            portraitScreen.setTransform('scale(0.45) translateX(-440px) translateY(-575px)');
-            document.body.appendChild(portraitScreen.divElement);
-            
-            landscapeScreen = new LCARSScreen('_landscape', '', 970, 550, 0, 0, 1136, 640);
-            landscapeScreen.divElement.style.border = "1px solid white";
-            landscapeScreen.setTransform('scale(0.58) translateX(-355px) translateY(-200px)');
-            document.body.appendChild(landscapeScreen.divElement);
-            
-            updateOrientation();
-
+        
 
             /**
              * Portrait Screen
              */
-            hb_end_cap_w = new LCARSRectangle("hb_end_cap_w", "", 10, 5, 20, 30, ES_RECT_RND_W | EC_ORANGE);
-            portraitScreen.addComponent(hb_end_cap_w);
-
-            rect_title_bar = new LCARSRectangle("rect_title_bar", "", 35, 5, 385, 30, EC_ORANGE);
-            portraitScreen.addComponent(rect_title_bar);
-
-            text_title = new LCARSText("text_title", "403 - FORBIDDEN", 425, FONT_SUBTITLE_SIZE -7 , EF_SUBTITLE | EC_ORANGE);
-            portraitScreen.addComponent(text_title);
-
-            hb_end_cap_e = new LCARSRectangle("hb_end_cap_e", "", 680, 5, 20, 30, ES_RECT_RND_E | EC_ORANGE);
-            portraitScreen.addComponent(hb_end_cap_e);
             
             
-            text_message = new LCARSText("text_message", "ACCESS DENIED", 50, 350 , EF_TITLE | EC_RED);
+            text_message = new LCARSText("text_message", "ACCESS DENIED", 100, 350 , EF_TITLE | EC_RED);
             text_message.setTextFontSize(110);
             portraitScreen.addComponent(text_message);
             
@@ -75,31 +94,10 @@
             portraitScreen.addComponent(text_message_sub_3);
 
 
-            fb_end_cap_w = new LCARSRectangle("fb_end_cap_w", "", 10, 975, 20, 30, ES_RECT_RND_W | EC_ORANGE);
-            portraitScreen.addComponent(fb_end_cap_w);
-
-            rect_footer_bar = new LCARSRectangle("rect_footer_bar", "", 35, 975, 640, 30, EC_ORANGE);
-            portraitScreen.addComponent(rect_footer_bar);
-
-            fb_end_cap_e = new LCARSRectangle("fb_end_cap_e", "", 680, 975, 20, 30, ES_RECT_RND_E | EC_ORANGE);
-            portraitScreen.addComponent(fb_end_cap_e);
-
 
             /**
              * Landscape Screen
              */
-            l_hb_end_cap_w = new LCARSRectangle("l_hb_end_cap_w", "", 10, 5, 20, 30, ES_RECT_RND_W | EC_ORANGE);
-            landscapeScreen.addComponent(l_hb_end_cap_w);
-
-            l_rect_title_bar = new LCARSRectangle("l_rect_title_bar", "", 35, 5, 650, 30, EC_ORANGE);
-            landscapeScreen.addComponent(l_rect_title_bar);
-            
-            l_text_title = new LCARSText("l_text_title", "403 - FORBIDDEN", 690, FONT_SUBTITLE_SIZE -7 , EF_SUBTITLE | EC_ORANGE);
-            landscapeScreen.addComponent(l_text_title);
-
-            l_hb_end_cap_e = new LCARSRectangle("l_hb_end_cap_e", "", 940, 5, 20, 30, ES_RECT_RND_E | EC_ORANGE);
-            landscapeScreen.addComponent(l_hb_end_cap_e);
-
 
             l_text_message = new LCARSText("l_text_message", "ACCESS DENIED", 250, 200 , EF_TITLE | EC_RED);
             l_text_message.setTextFontSize(90);
@@ -113,16 +111,6 @@
 
             l_text_message_sub_3 = new LCARSText("tl_ext_message_sub_3", "SYSTEM ID: " + host, 375, 400 , EF_SUBTITLE | EC_RED);
             landscapeScreen.addComponent(l_text_message_sub_3);
-
-
-            l_fb_end_cap_w = new LCARSRectangle("l_fb_end_cap_w", "", 10, 515, 20, 30, ES_RECT_RND_W | EC_ORANGE);
-            landscapeScreen.addComponent(l_fb_end_cap_w);
-
-            l_rect_footer_bar = new LCARSRectangle("l_rect_footer_bar", "", 35, 515, 900, 30, EC_ORANGE);
-            landscapeScreen.addComponent(l_rect_footer_bar);
-
-            l_fb_end_cap_e = new LCARSRectangle("l_fb_end_cap_e", "", 940, 515, 20, 30, ES_RECT_RND_E | EC_ORANGE);
-            landscapeScreen.addComponent(l_fb_end_cap_e);
 
 
 
@@ -140,25 +128,27 @@
         var updateOrientation = function() {
             switch(window.orientation) {
                 case 0:
-                portraitScreen.divElement.style.visibility = 'visible';
-                landscapeScreen.divElement.style.visibility = 'hidden';
+                portraitScreen.element.style.visibility = 'visible';
+                landscapeScreen.element.style.visibility = 'hidden';
                 break;
                 case -90:
-                portraitScreen.divElement.style.visibility = 'hidden';
-                landscapeScreen.divElement.style.visibility = 'visible';
+                portraitScreen.element.style.visibility = 'hidden';
+                landscapeScreen.element.style.visibility = 'visible';
                 break;
                 case 90:
-                portraitScreen.divElement.style.visibility = 'hidden';
-                landscapeScreen.divElement.style.visibility = 'visible';
+                portraitScreen.element.style.visibility = 'hidden';
+                landscapeScreen.element.style.visibility = 'visible';
                 break;
                 case 180:
-                portraitScreen.divElement.style.visibility = 'visible';
-                landscapeScreen.divElement.style.visibility = 'hidden';
+                portraitScreen.element.style.visibility = 'visible';
+                landscapeScreen.element.style.visibility = 'hidden';
                 break;
                 default:
                 break;
             }
         }
+        
+        window.onscroll = function () { window.scrollTo(0, 0); };
         </script>
         
     </head>

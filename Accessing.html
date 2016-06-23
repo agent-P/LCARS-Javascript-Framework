@@ -1,0 +1,87 @@
+<html>
+    
+    <head>
+        <title>Accessing</title>
+        <link rel="apple-touch-icon" href="./img/apple-touch-icon.png"/>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+        <meta name = "viewport" content = "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        
+        <script src="./js/LCARS_Components.js"></script>
+        <script src="./js/LCARS_Screens.js"></script>
+        <script src="./js/AccessingScreens.js"></script>
+        <style>
+            @font-face {
+                font-family: "LCARS";
+                src: url(./Antonio-Light.ttf) format("truetype");
+            }
+        </style>
+        
+        <script language="javascript" type="text/javascript">
+            
+            
+            
+            var host = window.location.hostname;
+            var hostname = host.toUpperCase();
+            //var hostname = "RPI-1.LOCAL";
+            
+            var portraitDivElement;
+            var landscapeDivElement;
+            
+            var portraitScreen;
+            var landscapeScreen;
+            
+            /**
+             * The application initialization function ************************************************
+             */
+        var  init = function() {
+            
+            showAccessingScreen(portraitDivElement, landscapeDivElement);
+            //removeAccessingScreen();
+            
+        }
+        
+        
+        /**
+         * Update the display based on the orientation of the device. Note the 180 degree case
+         * is not detected in iOS 8.x.
+         *    0: portrait screen is visible, landscape screen is hidden
+         *   90: portrait screen is hidden, landscape screen is visible
+         *  -90: portrait screen is hidden, landscape screen is visible
+         *  180: no screen change, last screen remains
+         */
+        var updateOrientation = function() {
+            switch(window.orientation) {
+                case 0:
+                portraitScreen.element.style.visibility = 'visible';
+                landscapeScreen.element.style.visibility = 'hidden';
+                break;
+                case -90:
+                portraitScreen.element.style.visibility = 'hidden';
+                landscapeScreen.element.style.visibility = 'visible';
+                break;
+                case 90:
+                portraitScreen.element.style.visibility = 'hidden';
+                landscapeScreen.element.style.visibility = 'visible';
+                break;
+                case 180:
+                portraitScreen.element.style.visibility = 'visible';
+                landscapeScreen.element.style.visibility = 'hidden';
+                break;
+                default:
+                break;
+            }
+        }
+        
+        window.onscroll = function () { window.scrollTo(0, 0); };
+            </script>
+        
+    </head>
+    
+    <body  bgcolor="#000000" onload="init();" onorientationchange="updateOrientation();">
+        
+    </body>
+    
+</html>
+
