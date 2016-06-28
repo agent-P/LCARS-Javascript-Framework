@@ -1306,6 +1306,170 @@ LCARSKeypad.prototype.setButtonAuxText = function(button, text) {
 }
 
 
+
+
+/**
+ * LCARS Analog Clock component
+ */
+LCARSClockAnalog.prototype = new LCARSComponent();
+function LCARSClockAnalog(name, label, x, y, radius, properties, updateInterval, format) {
+    LCARSComponent.call(this, name, label, x, y, properties);
+    this.static = ES_STATIC;  // Text is always static.
+    this.textColor = this.getColor();
+    
+    /** Set the size of the clock face. */
+    this.element.style.height = radius*2 + "px";
+    this.element.style.width = radius*2 + "px";
+    
+    this.radius = radius;
+    
+    this.updateInterval = updateInterval;
+    this.format = format;
+    
+    this.intervalVariable = null;
+    
+    this.drawShape();
+    
+    this.update();
+    
+    this.start();
+}
+
+/**
+ * Function to start the clock. It retrieves a reference to the clock object,
+ * and passes it to an interval timer. The update interval is a class
+ * variable, and is passed to the constructor of the object.
+ */
+LCARSClockAnalog.prototype.start = function() {
+    
+    thisObj = this; // Can't just pass "this" to the setInterval function.
+    
+    thisObj.intervalVariable = setInterval( (function(thisObj) { return function() { thisObj.update(); } })(this), thisObj.updateInterval );
+}
+
+/**
+ * Function to stop the clock. It test the interval variable, and if it is not
+ * null, it clears it.
+ */
+LCARSClockAnalog.prototype.stop = function() {
+    if(!(intervalVariable == null)) {
+        clearInterval(intervalVariable);
+    }
+}
+
+
+/**
+ * Function to update the clock with the current time. It gets passed to an
+ * interval timer and will update the time and date at the rate set by the
+ * interval variable.
+ */
+LCARSClockAnalog.prototype.update = function() {
+    
+    /** Update to the current date and time. */
+    now = new Date();
+    
+    /** Calculate the angles in degrees for the secons, minutes, and hours hands. */
+    secondsDegrees = 6*now.getSeconds();
+    minuteDegrees = 6*now.getMinutes();
+    hourDegrees = 30*(now.getHours()%12) + now.getMinutes()/2;
+    
+    /** Rotate the hands of the clock. */
+    this.secondHand.setAttribute('transform', 'rotate(' + secondsDegrees + ' ' + centerX + ' ' + centerY + ')');
+    this.minuteHand.setAttribute('transform', 'rotate(' + minuteDegrees + ' ' + centerX + ' ' + centerY + ')');
+    this.hourHand.setAttribute('transform', 'rotate(' + hourDegrees + ' ' + centerX + ' ' + centerY + ')');
+    
+}
+
+LCARSClockAnalog.prototype.drawShape = function() {
+    
+    this.drawClockFace();
+
+    this.drawClockHands();
+    
+    return "";
+}
+
+
+LCARSClockAnalog.prototype.drawClockHands = function() {
+    
+    this.drawClockFace();
+    
+    centerX = this.radius;
+    centerY = this.radius;
+    
+    this.hourHand = document.createElementNS(svgNS, "line");
+    this.hourHand.setAttribute('x1', centerX);
+    this.hourHand.setAttribute('y1', centerY);
+    this.hourHand.setAttribute('x2', centerX);
+    this.hourHand.setAttribute('y2', this.radius*0.5);
+    this.hourHand.setAttribute('stroke', this.color);
+    this.hourHand.setAttribute('stroke-width', this.radius/10);
+    this.hourHand.setAttribute('stroke-linecap', 'round');
+    
+    this.minuteHand = document.createElementNS(svgNS, "line");
+    this.minuteHand.setAttribute('x1', centerX);
+    this.minuteHand.setAttribute('y1', centerY);
+    this.minuteHand.setAttribute('x2', centerX);
+    this.minuteHand.setAttribute('y2', this.radius*0.25);
+    this.minuteHand.setAttribute('stroke', this.color);
+    this.minuteHand.setAttribute('stroke-width', this.radius/20);
+    this.minuteHand.setAttribute('stroke-linecap', 'round');
+    
+    this.secondHand = document.createElementNS(svgNS, "line");
+    this.secondHand.setAttribute('x1', centerX);
+    this.secondHand.setAttribute('y1', centerY);
+    this.secondHand.setAttribute('x2', centerX);
+    this.secondHand.setAttribute('y2', this.radius*0.15);
+    this.secondHand.setAttribute('stroke', this.color);
+    this.secondHand.setAttribute('stroke-width', this.radius/40);
+    this.secondHand.setAttribute('stroke-linecap', 'round');
+    
+    this.element.appendChild(this.hourHand);
+    this.element.appendChild(this.minuteHand);
+    this.element.appendChild(this.secondHand);
+}
+
+
+
+LCARSClockAnalog.prototype.drawClockFace = function() {
+    
+    centerX = this.radius;
+    centerY = this.radius;
+    
+    xOffset = this.radius/35;
+    yOffset = this.radius/15;
+    
+    
+    angleIncrement = 360/12;
+    
+    for(i=12; i>=1; i--) {
+        
+        /** Set the angle and convert to radians. */
+        angle = ((angleIncrement * i) - 90) * (Math.PI/180);
+        
+        /** Calculate the x, y coordinates of the hour text. */
+        x = centerX + this.radius * Math.cos(angle);
+        y = centerY + this.radius * Math.sin(angle);
+        
+        var adjustedOffsetX = xOffset;
+        if(i >= 10) {
+            adjustedOffsetX = xOffset*2;
+        }
+        
+        /** Create the hour text object and add it to the parent SVG. */
+        clockHourText = new LCARSText("hour_" + i.toString(), i.toString(), x-adjustedOffsetX, y+yOffset, this.properties);
+        //clockHourText.setTextFontSize(this.font_size);
+        clockHourText.setTextFontSize(this.radius/5);
+        
+        
+        this.element.appendChild(clockHourText.element);
+    }
+    
+}
+
+
+
+
 /**
  * LCARS Clock component
  */
@@ -1336,7 +1500,7 @@ LCARSClock.prototype.start = function() {
     
     thisObj = this; // Can't just pass "this" to the setInterval function.
     
-    thisObj.intervalVariable = setInterval(function() {thisObj.update()}, thisObj.updateInterval);
+    thisObj.intervalVariable = setInterval( (function(thisObj) { return function() { thisObj.update(); } })(this), thisObj.updateInterval );
 }
 
 /**
@@ -1674,7 +1838,7 @@ LCARSCalendar.prototype.startAutoUpdate = function() {
     
     thisObj = this; // Can't just pass "this" to the setInterval function.
     
-    thisObj.intervalVariable = setInterval(function() {thisObj.update()}, 1000); // Update is fixed to one second.
+    thisObj.intervalVariable = setInterval( (function(thisObj) { return function() { thisObj.update(); } })(this), 1000); // Update is fixed to one second.
 }
 
 /**

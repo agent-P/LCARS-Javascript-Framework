@@ -53,18 +53,21 @@
             clock_1.setTextFontSize(100);
             
             
-            clock_2 = new LCARSClock("clock_2", "LCARS clock_2 Text", 200, 475 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 500, "h:mm:ss");
+            clock_2 = new LCARSClock("clock_2", "LCARS clock_2 Text", 300, 375 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 500, "h:mm:ss");
             testScreen.addComponent(clock_2);
             
             clock_2.setTextFontSize(100);
             
 
  
-            calendar = new LCARSCalendar("calendar test", 10, 600, 75, 3);
+            calendar = new LCARSCalendar("calendar test", 100, 600, 45, 3);
             testScreen.addComponent(calendar);
             
             //calendar.incrementYear();
             //calendar.startAutoUpdate();
+            
+            analog_clock = new LCARSClockAnalog("", "", 1150, 550, 350, EF_TITLE | EC_ORANGE, 500, "");
+            testScreen.addComponent(analog_clock);
         }
         
         
