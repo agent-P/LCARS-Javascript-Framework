@@ -163,10 +163,37 @@ const DAYS_OF_WEEK_ABBREVIATED = [
               "Sat"
               ];
 
+
+/**
+ * The base class for all of the non component specific functionality.
+ *
+ * @author Perry Spagnola
+ * @version 1.0
+ */
 function LCARS() {
     
 }
 
+
+/**
+ * Derive the LCARS color from the LCARS properties variable.
+ * <p>
+ * Masks the <code>properties</code> paramenter for <code>ES_COLOR</code>, and
+ * returns the color value for the color property. The eight (8) color options are:
+ * <ul>
+ * <li> white:       #CCDDFF
+ * <li> light blue:  #5599FF
+ * <li> medium blue: #3366FF
+ * <li> blue:        #0011EE
+ * <li> dark blue:   #000088
+ * <li> yellow:      #CCA300
+ * <li> orange:      #CC6600
+ * <li> red:         #A30000
+ * </ul>
+ *
+ * @param properties The composite variable that contains all of the LCARS properties of an LCARS component.
+ * @return the color value for the color property specified in the LCARS <code>properties</code> paramenter.
+ */
 LCARS.getColor = function(properties) {
     var color = "";
     
@@ -194,14 +221,75 @@ LCARS.getColor = function(properties) {
     return color;
 }
 
+
+/**
+ * Derive the LCARS text color from the LCARS properties variable.
+ * <p>
+ * Masks the <code>properties</code> paramenter for <code>ES_COLOR</code>, and
+ * returns the text color value for the color property. The eight (8) color options are:
+ * <ul>
+ * <li> white:       #CCDDFF
+ * <li> light blue:  #5599FF
+ * <li> medium blue: #3366FF
+ * <li> blue:        #0011EE
+ * <li> dark blue:   #000088
+ * <li> yellow:      #CCA300
+ * <li> orange:      #CC6600
+ * <li> red:         #A30000
+ * </ul>
+ *
+ * @param properties The composite variable that contains all of the LCARS properties of an LCARS component.
+ * @return the text color value for the color property specified in the LCARS <code>properties</code> paramenter.
+ */
+LCARS.getTextColor = function(properties) {
+    var color = "";
+    
+    switch(properties & ES_COLOR) {
+        case EC_BLUE:
+        case EC_D_BLUE:
+        case EC_RED:
+            return "#CCDDFF";
+        case EC_WHITE:
+        case EC_YELLOW:
+        case EC_ORANGE:
+        case EC_L_BLUE:
+        case EC_M_BLUE:
+        default:
+            return "#000000";
+    }
+    
+    return color;
+}
+
+
+/**
+ * Simple setter for setting the LCARS font to the font specified by the 
+ * argument.
+ *
+ * @param font the font to set as the LCARS font
+ */
 LCARS.setFont = function(font) {
     this.font = font;
 }
 
+/**
+ * Simple getter for getting the LCARS font.
+ *
+ * @return the font that was set as the LCARS font
+ */
 LCARS.getFont = function() {
     return this.font;
 }
 
+/**
+ * Derive the LCARS font size from the LCARS properties variable.
+ * <p>
+ * Masks the <code>properties</code> paramenter for <code>ES_FONT</code>, and
+ * returns the font size value for the font size property.
+ *
+ * @param properties The composite variable that contains all of the LCARS properties of an LCARS component.
+ * @return the color value for the color property specified in the LCARS <code>properties</code> paramenter.
+ */
 LCARS.getLCARSFontSize = function(properties) {
     switch(properties & ES_FONT) {
         case EF_TITLE:
@@ -223,6 +311,7 @@ LCARS.getLCARSFontSize = function(properties) {
  *
  * @param {String} text The text to be rendered.
  * @param {String} font The css font descriptor that text is to be rendered with (e.g. "Arial Narrow").
+ * @return the width of the <code>text</code> argument in context of the <code>font</code> argument.
  */
 LCARS.getTextWidth  = function(text, font) {
     canvas = document.createElement("canvas");
@@ -232,6 +321,15 @@ LCARS.getTextWidth  = function(text, font) {
     return metrics.width;
 }
 
+/**
+ * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
+ * Calls <code>LCARS.getTextWidth()</code> for each character of the String argument <code>text</code>,
+ * and returns the sum of the length of the characters.
+ *
+ * @param {String} text The text to be rendered.
+ * @param {String} font The css font descriptor that text is to be rendered with (e.g. "Arial Narrow").
+ * @return the width of the <code>text</code> argument in context of the <code>font</code> argument.
+ */
 LCARS.getTextWidth2  = function(text, font) {
     var width = 0;
     
@@ -258,6 +356,7 @@ LCARSComponent = function(id, label, x, y, properties) {
         this.y = y;
         this.properties = properties;
         this.static = properties & ES_STATIC;
+        this.blinking = properties & ES_BLINKING;
         this.color = this.getColor();
         this.overColor = this.getOverColor();
         this.downColor = this.getDownColor();
@@ -313,10 +412,18 @@ LCARSComponent.prototype.getTextColor = function() {
     return color;
 }
 
-LCARSComponent.prototype.getOverColor = function() {
-    var color = "";
+LCARSComponent.prototype.getOverColor = function(overrideColor) {
+    var defaultReturn = "";
+    var color;
     
-    switch(this.properties & ES_COLOR) {
+    if(overrideColor == null) {
+        color = this.properties & ES_COLOR;
+    }
+    else {
+        color = overrideColor;
+    }
+    
+    switch(color) {
         case EC_WHITE:
             return "#FFFFFF";
         case EC_L_BLUE:
@@ -337,13 +444,21 @@ LCARSComponent.prototype.getOverColor = function() {
             break;
     }
     
-    return color;
+    return defaultReturn;
 }
 
-LCARSComponent.prototype.getDownColor = function() {
-    var color = "";
+LCARSComponent.prototype.getDownColor = function(overrideColor) {
+    var defaultReturn = "";
+    var color;
     
-    switch(this.properties & ES_COLOR) {
+    if(overrideColor == null) {
+        color = this.properties & ES_COLOR;
+    }
+    else {
+        color = overrideColor;
+    }
+    
+    switch(color) {
         case EC_WHITE:
             return "#B8C7E6";
         case EC_L_BLUE:
@@ -364,7 +479,27 @@ LCARSComponent.prototype.getDownColor = function() {
             break;
     }
     
-    return color;
+    return defaultReturn;
+}
+
+
+/**
+ * Method to create a string of color values from dark to light derived from the
+ * LCARS color palette. I uses the Down color, the normal color, and the Over
+ * color in that order.
+ *
+ * @param color the color to derive the string of colors from
+ * @return the string of color values
+ */
+LCARSComponent.prototype.getBlinkColors = function(color) {
+    
+    if(color == null) {
+        color = this.properties & ES_COLOR;
+    }
+    
+    var colorString = "#000;" + this.getDownColor(color) + ";" + LCARS.getColor(color) + ";" + this.getOverColor(color);
+    
+    return colorString;
 }
 
 LCARSComponent.prototype.setComponentDynamics = function() {
@@ -554,6 +689,66 @@ LCARSComponent.prototype.setEnabled = function(enabled) {
         this.shapeElement.setAttribute("stroke-width", '2');
         this.shapeElement.setAttribute("fill-opacity", '0.1');
         this.textElement.setAttribute("fill", '#585858');
+    }
+}
+
+const BLINK_DURATION_ERROR = "0.5s";
+const BLINK_DURATION_WARNING = "0.75s";
+/**
+ * Method to turn blinking on and off for the component. If the <code>enabled</code> argument
+ * is <code>true</code>, it creates SVG shape and text animations for the component. Component
+ * color and blink animation duration can be set. If left blank or specified as null, default 
+ * color and animation duration will be used.
+ * <p>Color must be set using the LCARS palette constants, not specific color values. Duration
+ * can be set using one of two constants <code>BLINK_DURATION_ERROR</code> or
+ * <code>BLINK_DURATION_WARNING</code>, or it can be set to an arbitrary value using the form
+ * <code>"0.0s"</code>. Note that the "s" suffix stands for seconds.
+ *
+ * @param enabled <code>true</code> if blinking is enabled, <code>false</code> if not
+ * @param color the color to blink the component, default component color if null
+ * @param duration the duration of the blink animation in the form <code>"0.0s"</code>, the "s" is for seconds, default if null
+ */
+LCARSComponent.prototype.setBlinking = function(enabled, color, duration) {
+    
+    /** If the duration argument is null, set a default blink duration. */
+    if(duration == null) {
+        duration = BLINK_DURATION_WARNING;
+    }
+    
+    /** If blinking is enabled... */
+    if(enabled) {
+        /** Create the DOM object for shape animation, and set its attributes. */
+        this.animateElement = document.createElementNS(svgNS, "animate");
+        this.animateElement.setAttribute("attributeType", "XML");
+        this.animateElement.setAttribute("attributeName", "fill");
+        this.animateElement.setAttribute("values", this.getBlinkColors(color));
+        this.animateElement.setAttribute("dur", duration);
+        this.animateElement.setAttribute("repeatCount", "indefinite");
+        /** Append the animation element to the shape element. */
+        this.shapeElement.appendChild(this.animateElement);
+        
+        /** Create the DOM object for the shape's text animation, and set its attributes. */
+        this.textAnimateElement = document.createElementNS(svgNS, "animate");
+        this.textAnimateElement.setAttribute("attributeType", "XML");
+        this.textAnimateElement.setAttribute("attributeName", "fill");
+        this.textAnimateElement.setAttribute("values", "#000;" + LCARS.getTextColor(color));
+        this.textAnimateElement.setAttribute("dur", duration);
+        this.textAnimateElement.setAttribute("repeatCount", "indefinite");
+        /** Append the animation element to the text element. */
+        this.textElement.appendChild(this.textAnimateElement);
+        
+        
+    }
+    /** Else if blinking is not enabled... */
+    else {
+        /** If the shape animate element exists, remove it. */
+        if(this.animateElement != null) {
+            this.shapeElement.removeChild(this.animateElement);
+        }
+        /** If the text animate element exists, remove it. */
+        if(this.textAnimateElement != null) {
+            this.textElement.removeChild(this.textAnimateElement);
+        }
     }
 }
 
@@ -1472,6 +1667,9 @@ LCARSClockAnalog.prototype.drawClockFace = function() {
 
 /**
  * LCARS Clock component
+ *
+ * @author Perry Spagnola
+ * @version 1.0
  */
 LCARSClock.prototype = new LCARSComponent();
 function LCARSClock(name, label, x, y, properties, updateInterval, format) {
@@ -1702,7 +1900,23 @@ LCARSClock.prototype.drawShape = function() {
 
 const MAX_DAYS_IN_MONTH_DISPLAY = 42; /** 6 lines of 7 days */
 /**
- * LCARS Calendar component
+ * LCARS Calendar component - It provides a maximum six (6) week, seven (7) day array of days
+ * with a month and year header.
+ * <p>
+ * The format of the days array is based on the starting day of the week for the month and the
+ * number of days in the month. The weeks start on Sundays and end on Saturdays. Days for the 
+ * preceding and following months are blank. The days are color coded as follows:
+ * <ul>
+ * <li> Sunday    orange          <code>[EC_ORANGE]</code>
+ * <li> Weekday   light blue      <code>[EC_L_BLUE]</code>
+ * <li> Saturday  blue            <code>[EC_BLUE]</code>
+ * <li> Today     yellow          <code>[EC_YELLOW]</code>
+ * </ul>
+ * <p>
+ * Note: There is currently no convenience method for changing the color coding of the days.
+ *
+ * @author Perry Spagnola
+ * Aversion 1.0
  */
 LCARSCalendar.prototype = new LCARSComponent();
 function LCARSCalendar(name, x, y, font_size, daySpacing, properties) {
@@ -1714,22 +1928,36 @@ function LCARSCalendar(name, x, y, font_size, daySpacing, properties) {
     
     this.daySpacing = daySpacing;
 
+    /** Set the curretn day as today. */
     this.setToday();
 
     this.intervalVariable = null;
 
+    /** Set the initial displayed month and year. */
     this.displayMonth = this.currentMonth;
     this.displayYear = this.currentYear;
     
     /** Create an array to hold 6 lines of 7 days. */
     this.displayDays = new Array(MAX_DAYS_IN_MONTH_DISPLAY);
 
+    /** Draw the calendar SVG shape. */
     this.drawShape();
     
+    /** Populate the calendar with month, year, and days. */
     this.updateCalendar();
     
 }
 
+
+/**
+ * Draw the calendar component SVG shape.
+ * <p>
+ * Creates all of the SVG Text elements within a parent SVG element. There are two (2)
+ * elements for the month and year header, and forty-two (42) <code>MAX_DAYS_IN_MONTH_DISPLAY</code>
+ * elements for the days array of six (6) rows or weeks, and seven (7) cloumns or days.
+ *
+ * @return an empty string.
+ */
 LCARSCalendar.prototype.drawShape = function() {
     
     var header_offset = this.font_size * 2;
@@ -1762,11 +1990,31 @@ LCARSCalendar.prototype.drawShape = function() {
 }
 
 
+/**
+ * This method updates the displayed calendar.
+ * <p>
+ * It retrieves the appropriate string literals, and formats the standard seven (7) day,
+ * four (4) to six (6) week month array based on the starting day of the week for the
+ * particular month. The weeks start on Sundays and end on Saturdays. The days are color
+ * coded as follows:
+ * <ul>
+ * <li> Sunday    orange          <code>[EC_ORANGE]</code>
+ * <li> Weekday   light blue      <code>[EC_L_BLUE]</code>
+ * <li> Saturday  blue            <code>[EC_BLUE]</code>
+ * <li> Today     yellow          <code>[EC_YELLOW]</code>
+ * </ul>
+ */
 LCARSCalendar.prototype.updateCalendar = function() {
     
+    /** 
+     * Get the strings for the display month and the display year for the calendar header.
+     */
     this.displayMonthString = MONTHS[this.displayMonth+1];
     this.displayYearString = this.displayYear.toString();
     
+    /** 
+     * Set the month and year text for the calendar header.
+     */
     this.monthText.setText(this.displayMonthString);
     this.yearText.setText(this.displayYearString);
     
@@ -1802,7 +2050,7 @@ LCARSCalendar.prototype.updateCalendar = function() {
                 this.displayDays[i].textElement.setAttribute("fill", LCARS.getColor(EC_ORANGE));
             }
             if(this.isSaturday(day)) {
-                this.displayDays[i].textElement.setAttribute("fill", LCARS.getColor(EC_M_BLUE));
+                this.displayDays[i].textElement.setAttribute("fill", LCARS.getColor(EC_BLUE));
             }
             
             if(this.isToday(day)) {
@@ -1813,29 +2061,40 @@ LCARSCalendar.prototype.updateCalendar = function() {
 }
 
 
+/**
+ * This method is runonce a second to detect the day roll-over. So, the calendar can
+ * be automatically updated. When the roll-over is detected, the new day is set as "today",
+ * and the display is updated.
+ */
 LCARSCalendar.prototype.update = function() {
-    var rightNow = new Date();
     
-    if(!(rightNow.getYear() == this.now.getYear()) || !(rightNow.getMonth() == this.now.getMonth())) {
-        alert("cy: " + this.currentYear + "  cm: " + this.currentMonth + "  rn: " + rightNow.getYear() + ", " + rightNow.getMonth());
+    /** Get the current date. */
+    var rightNow = new Date();
+
+    /**
+     * Compare the current date (year, month, and day of month) to the date stored by
+     * the <code>setToday()</code> method. If they are not the same, set the new today,
+     * and update the displayed calendar.
+     */
+    if(!(rightNow.getYear() == this.now.getYear()) ||
+       !(rightNow.getMonth() == this.now.getMonth()) ||
+       !(rightNow.getDate() == this.now.getDate())) {
+        //alert("now: " + this.now.getYear() + ", " + this.now.getMonth() + ", " + this.now.getDate() +
+        //      "  right now: " + rightNow.getYear() + ", " + rightNow.getMonth() + ", " + rightNow.getDate());
         this.setToday();
         this.displayMonth = this.currentMonth;
         this.displayYear = this.currentYear;
         this.updateCalendar();
     }
-    
-    // ****** TEST CODE
-    this.stopAutoUpdate();
 }
 
 
 /**
  * Function to start the auto update of the calendar. It retrieves a reference 
- * to the clock object, and passes it to an interval timer. The update interval 
- * is a class variable, and is passed to the constructor of the object.
+ * to the calendar object, and passes it to an interval timer. The update interval
+ * is fixed to one second.
  */
 LCARSCalendar.prototype.startAutoUpdate = function() {
-    
     thisObj = this; // Can't just pass "this" to the setInterval function.
     
     thisObj.intervalVariable = setInterval( (function(thisObj) { return function() { thisObj.update(); } })(this), 1000); // Update is fixed to one second.
@@ -1852,6 +2111,13 @@ LCARSCalendar.prototype.stopAutoUpdate = function() {
 }
 
 
+/**
+ * Function to clear the calendar day SVG elements of text.
+ * <p>
+ * A convenience function for clearing the day elements of text. The SVG text of each
+ * element is set to an empty string. Not really necessary, since the method that updates
+ * the calendar array of days resets the text of the entire array.
+ */
 LCARSCalendar.prototype.clearCalendarText = function() {
     for(i=0; i<MAX_DAYS_IN_MONTH_DISPLAY; i++) {
         this.displayDays[i].setText("");
@@ -2115,17 +2381,4 @@ LCARSCalendar.prototype.getDaysInMonth = function(month, year) {
     }
     return days;
 }
-
-
-
-
-
-///**
-// * Draws the current month calendar.
-// */
-//LCARSCalendar.prototype.drawCalendar() = function() {
-//
-//    this.drawText();
-//    
-//}
 

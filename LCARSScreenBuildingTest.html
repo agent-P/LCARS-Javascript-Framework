@@ -109,10 +109,13 @@
             button_4 = new LCARSButton("button_4", "Button 4", 1315, 750, 4, EC_ORANGE);
             testScreen.addComponent(button_4);
             button_5 = new LCARSButton("button_5", "Button 5", 850, 945, 0, ES_RECT_RND | EC_ORANGE);
+            button_5.setBlinking(true, EC_D_BLUE, BLINK_DURATION_WARNING);
             testScreen.addComponent(button_5);
             button_6 = new LCARSButton("button_6", "Button 6", 1005, 945, 0, ES_RECT_RND | EC_ORANGE);
+            button_6.setBlinking(true, null, BLINK_DURATION_ERROR);
             testScreen.addComponent(button_6);
             button_7 = new LCARSButton("button_7", "Button 7", 1160, 945, 0, ES_RECT_RND | EC_ORANGE);
+            button_7.setBlinking(true);
             testScreen.addComponent(button_7);
             
             text_1 = new LCARSText("text_1", "LCARS Title Text", 1490, 750 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE);
@@ -172,6 +175,7 @@
             
             clock_1.setTextFontSize(100);
             
+            //button_5.setBlinking(false);
 
  
             //calendar = new LCARSCalendar("calendar test", "LCARS Body Text", 1490, 850 + FONT_BODY_SIZE, EF_BODY | EC_ORANGE);
