@@ -51,7 +51,7 @@
             lrc = new LCARSCorner("LRC", "Lower Right", 1010, 197, 905, 1, ES_SHAPE_SE | EC_ORANGE | ES_STATIC);
             testScreen.addComponent(lrc);
             
-            ulc1 = new LCARSCorner("ULC1", "Text", 5, 299, 500, 5, ES_SHAPE_NW | EC_WHITE);
+            ulc1 = new LCARSCorner("ULC1", "Text", 5, 299, 500, 5, ES_SHAPE_NW | EC_WHITE | ES_BLINKING);
             testScreen.addComponent(ulc1);
             ulc2 = new LCARSCorner("ULC2", "Text", 160, 339, 500, 4, ES_SHAPE_NW | EC_L_BLUE);
             testScreen.addComponent(ulc2);
@@ -70,7 +70,7 @@
             text_corner = new LCARSText("text_corner", "LCARS Button Text Corner", 1625, 579 + FONT_BUTTON_SIZE-3, EF_BUTTON | EC_ORANGE);
             testScreen.addComponent(text_corner);
             
-            rect_1 = new LCARSRectangle("RECT1", "", 10, 675, 1000, 30, EC_ORANGE);
+            rect_1 = new LCARSRectangle("RECT1", "", 10, 675, 1000, 30, EC_ORANGE | ES_BLINKING);
             testScreen.addComponent(rect_1);
             rect_2 = new LCARSRectangle("RECT2", "rect2", 10, 750, 150, 60, EC_ORANGE);
             testScreen.addComponent(rect_2);
@@ -118,7 +118,7 @@
             button_7.setBlinking(true);
             testScreen.addComponent(button_7);
             
-            text_1 = new LCARSText("text_1", "LCARS Title Text", 1490, 750 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE);
+            text_1 = new LCARSText("text_1", "LCARS Title Text", 1490, 750 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE | ES_BLINKING);
             testScreen.addComponent(text_1);
             text_2 = new LCARSText("text_2", "LCARS Subtitle Text", 1490, 820 + FONT_SUBTITLE_SIZE, EF_SUBTITLE | EC_ORANGE);
             testScreen.addComponent(text_2);

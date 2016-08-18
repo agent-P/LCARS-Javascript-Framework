@@ -369,6 +369,12 @@ LCARSComponent = function(id, label, x, y, properties) {
         this.element.setAttribute("y", 0);
         this.element.setAttribute("transform", 'translate(' + x + ',' +  y +')');
         
+        this.shapeElement = document.createElementNS(svgNS, "path");
+        this.textElement = document.createElementNS(svgNS, "text");
+
+        /** Set the component's dynamics. */
+        this.setComponentDynamics();
+        
     }
 }
 
@@ -510,6 +516,10 @@ LCARSComponent.prototype.setComponentDynamics = function() {
         this.shapeElement.setAttribute("onmouseout", "evt.target.setAttribute('fill','" + this.color + "')");
         //this.shapeElement.setAttribute("onclick", "alert('click!')");
     }
+    
+    if(this.blinking) {
+        this.setBlinking(true);
+    }
 }
 
 LCARSComponent.prototype.getTextX = function() {
@@ -646,14 +656,10 @@ LCARSComponent.prototype.drawShape = function() {
     rectString += westEndString + northString + eastEndString + southString;
     
     /** Create the DOM object, and set its attributes. */
-    this.shapeElement = document.createElementNS(svgNS, "path");
     this.shapeElement.setAttribute("d", rectString);
     this.setShapeAttributes();
     
     this.element.appendChild(this.shapeElement);
-    
-    /** Set the component's dynamics. */
-    this.setComponentDynamics();    
 }
 
 
@@ -709,7 +715,6 @@ const BLINK_DURATION_WARNING = "0.75s";
  * @param duration the duration of the blink animation in the form <code>"0.0s"</code>, the "s" is for seconds, default if null
  */
 LCARSComponent.prototype.setBlinking = function(enabled, color, duration) {
-    
     /** If the duration argument is null, set a default blink duration. */
     if(duration == null) {
         duration = BLINK_DURATION_WARNING;
@@ -754,7 +759,6 @@ LCARSComponent.prototype.setBlinking = function(enabled, color, duration) {
 
 
 LCARSComponent.prototype.drawText = function() {
-    this.textElement = document.createElementNS(svgNS, "text");
     this.setTextAttributes();
     this.setText(this.label);
     
@@ -849,17 +853,10 @@ LCARSCorner.prototype.drawShape = function() {
         armStringE + ",0";
     }
     
-    /** Create the DOM object. */
-    this.shapeElement = document.createElementNS(svgNS, "path");
-    //this.shapeElement.setAttribute("id", this.id + SHAPE_SUFFIX);
     this.shapeElement.setAttribute("d", pathString);
-    //this.shapeElement.setAttribute("fill", this.color);
     this.setShapeAttributes();
     
     this.element.appendChild(this.shapeElement);
-    
-    /** Set the component's dynamics. */
-    this.setComponentDynamics();
 }
 
 
@@ -927,7 +924,6 @@ LCARSCorner.prototype.getTextAnchor = function() {
 LCARSCorner.prototype.drawText = function() {
     
     if(this.label != "" && this.label != null) {
-        this.textElement = document.createElementNS(svgNS, "text");
         this.setTextAttributes();
         this.setText(this.label);
         
@@ -1115,6 +1111,10 @@ function LCARSText(name, label, x, y, properties) {
     this.textColor = this.getColor();
     
     this.drawText();
+    
+    if(this.blinking) {
+        this.setBlinking(true);
+    }
 }
 
 LCARSText.prototype.getTextAnchor = function() {
@@ -1137,7 +1137,34 @@ LCARSText.prototype.getTextY = function() {
     return 0;
 }
 
-
+LCARSText.prototype.setBlinking = function(enabled, color, duration) {
+    /** If the duration argument is null, set a default blink duration. */
+    if(duration == null) {
+        duration = BLINK_DURATION_WARNING;
+    }
+    
+    /** If blinking is enabled... */
+    if(enabled) {
+        /** Create the DOM object for the shape's text animation, and set its attributes. */
+        this.textAnimateElement = document.createElementNS(svgNS, "animate");
+        this.textAnimateElement.setAttribute("attributeType", "XML");
+        this.textAnimateElement.setAttribute("attributeName", "fill");
+        this.textAnimateElement.setAttribute("values", this.getBlinkColors(color));
+        this.textAnimateElement.setAttribute("dur", duration);
+        this.textAnimateElement.setAttribute("repeatCount", "indefinite");
+        /** Append the animation element to the text element. */
+        this.textElement.appendChild(this.textAnimateElement);
+        
+        
+    }
+    /** Else if blinking is not enabled... */
+    else {
+        /** If the text animate element exists, remove it. */
+        if(this.textAnimateElement != null) {
+            this.textElement.removeChild(this.textAnimateElement);
+        }
+    }
+}
 
 
 /**
@@ -1171,7 +1198,6 @@ LCARSTextArea.prototype.getTextAnchor = function() {
 }
 
 LCARSTextArea.prototype.drawText = function() {
-    this.textElement = document.createElementNS(svgNS, "text");
     this.textElement.setAttribute("id", this.id + TEXT_SUFFIX);
     this.textElement.setAttribute("font-family", LCARS.getFont());
     this.textElement.setAttribute("font-size", this.fontSize);
