@@ -176,6 +176,9 @@
             clock_1.setTextFontSize(100);
             
             //button_5.setBlinking(false);
+            setInterval(function() { button_4.offBlink() }, 3000);
+            button_1.setVisible(false);
+            setInterval(function() { button_1.onBlink() }, 100);
 
  
             //calendar = new LCARSCalendar("calendar test", "LCARS Body Text", 1490, 850 + FONT_BODY_SIZE, EF_BODY | EC_ORANGE);

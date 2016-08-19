@@ -758,6 +758,32 @@ LCARSComponent.prototype.setBlinking = function(enabled, color, duration) {
 }
 
 
+/**
+ * Method to blink a visible LCARS component "off" (make invisible) for 0.1 seconds.
+ * Used for things like activity indicators.
+ */
+LCARSComponent.prototype.offBlink = function() {
+    var thisObject = this;
+    thisObject.setVisible(false);
+    setTimeout(function() { thisObject.setVisible(true) }, 10);
+}
+
+/**
+ * Method to blink a invisible LCARS component "on" (make visible) for 0.1 seconds.
+ * Used for things like activity indicators.
+ */
+LCARSComponent.prototype.onBlink = function() {
+    var thisObject = this;
+    thisObject.setVisible(true);
+    setTimeout(function() { thisObject.setVisible(false) }, 10);
+}
+
+/**
+ * Method to draw the text of the LCARS component, if any. The text element is created
+ * in the constructor. This method simply sets the text attributes, and the
+ * component label specified in the constructor. It then appends the text element
+ * to the parent SVG element.
+ */
 LCARSComponent.prototype.drawText = function() {
     this.setTextAttributes();
     this.setText(this.label);
@@ -766,6 +792,21 @@ LCARSComponent.prototype.drawText = function() {
 }
 
 
+/**
+ * Method to se the text attributes of the LCARS component. The text element is created
+ * in the constructor. This method simply sets the text attributes that are specified
+ * in the constructor. The attributes being set are:
+ * <ul>
+ * <li> component id</li>
+ * <li> x coordinate</li>
+ * <li> x coordinate</li>
+ * <li> text anchor location</li>
+ * <li> fill color dependent on enable/disable status of the component</li>
+ * <li> font family</li>
+ * <li> font size</li>
+ * <li> pointer events, text elements do not respond to pointer events</li>
+ * </ul>
+ */
 LCARSComponent.prototype.setTextAttributes = function() {
     this.textElement.setAttribute("id", this.id + TEXT_SUFFIX);
     this.textElement.setAttribute("x", this.getTextX());
@@ -783,17 +824,35 @@ LCARSComponent.prototype.setTextAttributes = function() {
 }
 
 
+/**
+ * Method to set the LCARS component's text element to the string specified by the argument.
+ *
+ * @param textString the text to set for the component
+ */
 LCARSComponent.prototype.setText = function(textString) {
     this.textElement.textContent = textString;
 }
 
 
+/**
+ * Method to set the LCARS component's text element's font size to the size specified by the argument.
+ * It also sets the object's <code>fontSize</code> attribute.
+ *
+ * @param textFontSize the font size to set for the component's text element
+ */
 LCARSComponent.prototype.setTextFontSize = function(textFontSize) {
     this.fontSize = textFontSize;
     this.textElement.setAttribute("font-size", this.fontSize);
 }
 
 
+/**
+ * Method to control the visibility of the LCARS component. If the argument is set to 
+ * <code>false</code>, the component will be invisible. If <code>true</code>, the 
+ * component will be visible.
+ *
+ * @param visible visible, if <code>true</code>, invisible, if <code>false</code>
+ */
 LCARSComponent.prototype.setVisible = function(visible) {
     if(visible) {
         this.element.setAttributeNS(null, 'display', 'inline');
