@@ -372,6 +372,20 @@ LCARSComponent = function(id, label, x, y, properties) {
         this.shapeElement = document.createElementNS(svgNS, "path");
         this.textElement = document.createElementNS(svgNS, "text");
 
+        /** Create the DOM object for shape animation, and set its attributes. */
+        this.animateElement = document.createElementNS(svgNS, "animate");
+        this.animateElement.setAttribute("id", this.element.id + "_shapeAnimate");
+        this.animateElement.setAttribute("attributeType", "XML");
+        this.animateElement.setAttribute("attributeName", "fill");
+        this.animateElement.setAttribute("repeatCount", "indefinite");
+        
+        /** Create the DOM object for the shape's text animation, and set its attributes. */
+        this.textAnimateElement = document.createElementNS(svgNS, "animate");
+        this.textAnimateElement.setAttribute("id", this.element.id + "_textAnimate");
+        this.textAnimateElement.setAttribute("attributeType", "XML");
+        this.textAnimateElement.setAttribute("attributeName", "fill");
+        this.textAnimateElement.setAttribute("repeatCount", "indefinite");
+        
         /** Set the component's dynamics. */
         this.setComponentDynamics();
         
@@ -723,22 +737,14 @@ LCARSComponent.prototype.setBlinking = function(enabled, color, duration) {
     /** If blinking is enabled... */
     if(enabled) {
         /** Create the DOM object for shape animation, and set its attributes. */
-        this.animateElement = document.createElementNS(svgNS, "animate");
-        this.animateElement.setAttribute("attributeType", "XML");
-        this.animateElement.setAttribute("attributeName", "fill");
         this.animateElement.setAttribute("values", this.getBlinkColors(color));
         this.animateElement.setAttribute("dur", duration);
-        this.animateElement.setAttribute("repeatCount", "indefinite");
         /** Append the animation element to the shape element. */
         this.shapeElement.appendChild(this.animateElement);
         
         /** Create the DOM object for the shape's text animation, and set its attributes. */
-        this.textAnimateElement = document.createElementNS(svgNS, "animate");
-        this.textAnimateElement.setAttribute("attributeType", "XML");
-        this.textAnimateElement.setAttribute("attributeName", "fill");
         this.textAnimateElement.setAttribute("values", "#000;" + LCARS.getTextColor(color));
         this.textAnimateElement.setAttribute("dur", duration);
-        this.textAnimateElement.setAttribute("repeatCount", "indefinite");
         /** Append the animation element to the text element. */
         this.textElement.appendChild(this.textAnimateElement);
         
@@ -748,11 +754,13 @@ LCARSComponent.prototype.setBlinking = function(enabled, color, duration) {
     else {
         /** If the shape animate element exists, remove it. */
         if(this.animateElement != null) {
-            this.shapeElement.removeChild(this.animateElement);
+            //this.shapeElement.removeChild(this.animateElement);
+            this.animateElement.remove();
         }
         /** If the text animate element exists, remove it. */
         if(this.textAnimateElement != null) {
-            this.textElement.removeChild(this.textAnimateElement);
+            //this.textElement.removeChild(this.textAnimateElement);
+            this.textAnimateElement.remove();
         }
     }
 }
