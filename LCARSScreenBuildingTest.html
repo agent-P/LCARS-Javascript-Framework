@@ -130,7 +130,7 @@
             testScreen.addComponent(text_5);
             
             var testListener = function(event) {
-                alert("testListener: " + event.srcElement.id[0]);
+                console.log("testListener: " + event.srcElement.id[0]);
             }
             
             
@@ -176,6 +176,8 @@
             clock_1.setTextFontSize(100);
             
             setTimeout(function() { button_5.setBlinking(false) }, 3000);
+            setTimeout(function() { button_5.setBlinking(true, EC_D_BLUE, BLINK_DURATION_WARNING) }, 5000);
+            setTimeout(function() { button_5.setBlinking(false) }, 10000);
             
             setInterval(function() { button_4.offBlink() }, 3000);
             button_1.setVisible(false);

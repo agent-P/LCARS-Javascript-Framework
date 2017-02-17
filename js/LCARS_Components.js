@@ -522,13 +522,32 @@ LCARSComponent.prototype.getBlinkColors = function(color) {
     return colorString;
 }
 
+
+/**
+ * Method to set the visual dynamics of the component. If the component's <code>ES_STATIC</code>
+ * property is not set, the following dynamics are covered:
+ * <ul>
+ * <li> <code>onmouseover</code>
+ * <li> <code>onmousedown</code>
+ * <li> <code>onmouseup</code>
+ * <li> <code>onmouseout</code>
+ * </ul>
+ */
 LCARSComponent.prototype.setComponentDynamics = function() {
     if(this.static != ES_STATIC) {
         this.shapeElement.setAttribute("onmouseover", "evt.target.setAttribute('fill','" + this.overColor + "')");
-        this.shapeElement.setAttribute("onmousedown", "evt.target.setAttribute('fill','" + this.downColor + "')");
-        this.shapeElement.setAttribute("onmouseup", "evt.target.setAttribute('fill','" + this.color + "')");
+        //this.shapeElement.setAttribute("onmousedown", "evt.target.setAttribute('fill','" + this.downColor + "')");
+        //this.shapeElement.setAttribute("onmouseup", "evt.target.setAttribute('fill','" + this.color + "')");
         this.shapeElement.setAttribute("onmouseout", "evt.target.setAttribute('fill','" + this.color + "')");
+        
+        this.shapeElement.setAttribute("onclick", "evt.target.setAttribute('fill','" + this.downColor + "'); " +
+                                       "setTimeout(function(){evt.target.setAttribute('fill','" + this.color + "')}, 250)");
+        
         //this.shapeElement.setAttribute("onclick", "alert('click!')");
+        //this.data = "TEST";
+        //boundClickFunction = (function() { console.log(this.data); }).bind(this);
+        //this.shapeElement.setAttribute("onclick", "boundClickFunction()");
+
     }
     
     if(this.blinking) {
@@ -736,13 +755,13 @@ LCARSComponent.prototype.setBlinking = function(enabled, color, duration) {
     
     /** If blinking is enabled... */
     if(enabled) {
-        /** Create the DOM object for shape animation, and set its attributes. */
+        /** Update the DOM object for shape animation, with color and duration attributes. */
         this.animateElement.setAttribute("values", this.getBlinkColors(color));
         this.animateElement.setAttribute("dur", duration);
         /** Append the animation element to the shape element. */
         this.shapeElement.appendChild(this.animateElement);
         
-        /** Create the DOM object for the shape's text animation, and set its attributes. */
+        /** Update the DOM object for the shape's text animation, with color and duration attributes. */
         this.textAnimateElement.setAttribute("values", "#000;" + LCARS.getTextColor(color));
         this.textAnimateElement.setAttribute("dur", duration);
         /** Append the animation element to the text element. */
@@ -754,12 +773,10 @@ LCARSComponent.prototype.setBlinking = function(enabled, color, duration) {
     else {
         /** If the shape animate element exists, remove it. */
         if(this.animateElement != null) {
-            //this.shapeElement.removeChild(this.animateElement);
             this.animateElement.remove();
         }
         /** If the text animate element exists, remove it. */
         if(this.textAnimateElement != null) {
-            //this.textElement.removeChild(this.textAnimateElement);
             this.textAnimateElement.remove();
         }
     }
@@ -777,7 +794,7 @@ LCARSComponent.prototype.offBlink = function() {
 }
 
 /**
- * Method to blink a invisible LCARS component "on" (make visible) for 0.1 seconds.
+ * Method to blink an invisible LCARS component "on" (make visible) for 0.1 seconds.
  * Used for things like activity indicators.
  */
 LCARSComponent.prototype.onBlink = function() {
@@ -2155,7 +2172,7 @@ LCARSCalendar.prototype.updateCalendar = function() {
 
 
 /**
- * This method is runonce a second to detect the day roll-over. So, the calendar can
+ * This method is run once a second to detect the day roll-over. So, the calendar can
  * be automatically updated. When the roll-over is detected, the new day is set as "today",
  * and the display is updated.
  */

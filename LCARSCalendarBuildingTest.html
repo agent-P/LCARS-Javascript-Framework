@@ -47,13 +47,13 @@
             lrc = new LCARSCorner("LRC", "", 1010, 197, 905, 1, ES_SHAPE_SE | EC_ORANGE | ES_STATIC);
             testScreen.addComponent(lrc);
             
-            clock_1 = new LCARSClock("clock_1", "LCARS clock_1 Text", 200, 175 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 500, "dddd h:mm:ss TT d MMM yyyy Z K");
+            clock_1 = new LCARSClock("clock_1", "LCARS clock_1 Text", 200, 175 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 1000, "dddd h:mm:ss TT d MMM yyyy Z K");
             testScreen.addComponent(clock_1);
             
             clock_1.setTextFontSize(100);
             
             
-            clock_2 = new LCARSClock("clock_2", "LCARS clock_2 Text", 300, 375 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 500, "h:mm:ss");
+            clock_2 = new LCARSClock("clock_2", "LCARS clock_2 Text", 300, 375 + FONT_TITLE_SIZE , EF_TITLE | EC_ORANGE, 1000, "h:mm:ss");
             testScreen.addComponent(clock_2);
             
             clock_2.setTextFontSize(100);
@@ -65,7 +65,7 @@
             
             calendar.startAutoUpdate();
             
-            analog_clock = new LCARSClockAnalog("", "", 1150, 550, 350, EF_TITLE | EC_ORANGE, 500, "");
+            analog_clock = new LCARSClockAnalog("", "", 1150, 550, 350, EF_TITLE | EC_ORANGE, 1000, "");
             testScreen.addComponent(analog_clock);
         }
         
