@@ -1,6 +1,9 @@
 LCARS-Javascript-Framework
 ==========================
 
+*Note: This component library is currently being ported to react and typescript. It can be found at the following link:*
+[react-LCARS-demo](https://github.com/agent-P/react-LCARS-demo)
+
 A javascript framework for building LCARS displays in web browsers. It uses an all javascript approach for building composite SVG LCARS components. It currently supports the following components:
 * LCARSScreen
 * LCARSRectangle
